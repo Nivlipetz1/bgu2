@@ -13,6 +13,7 @@ public class TransportMenu {
 	private MainTransport mainTransport;
 	private static int lastDest;
 	private static int lastSource;
+	private static int day;
 	
 	public TransportMenu(MainTransport mainTransport){
 		this.mainTransport=mainTransport;
@@ -45,7 +46,7 @@ public class TransportMenu {
 	}
 	
 	private void checkConditions(){
-		int day=-1, confirm =-1;
+		int confirm =-1;
 
 		while (day < 1 || day >7){
 			System.out.println("Please enter The Actual Day: ");
@@ -79,24 +80,31 @@ public class TransportMenu {
 		String date, leavingTime;
 		int truckPlateNum, driverID, source, tmpDest, itemID, counter=0;
 		boolean ans = true, order=true, transOrder=true;
-		
-		System.out.println("Step 1/7 - Please enter a Truck Plate Number: ");
+
+		System.out.println("Step 1/7 - Please enter the Date: (dd/mm/yy)");
+		date = day+" "+in.nextLine();
+		date = day+" "+in.nextLine();
+
+		System.out.println("Step 2/7 - Please enter the leaving time: (hh:mm)");
+		leavingTime = in.nextLine();
+
+		System.out.println("Step 3/7 - Please enter a Truck Plate Number: ");
 		truckPlateNum = truckExist();
-		System.out.println("Step 2/7 - Please enter a Driver ID: ");
+		System.out.println("Step 4/7 - Please enter a Driver ID: ");
 		driverID = driverExist();
 		canDrive (driverID, truckPlateNum);
 		
-		System.out.println("Step 3/7 - Please enter an Item ID: ");
+		System.out.println("Step 5/7 - Please enter an Item ID: ");
 		itemID=itemExist();
 		itemsNumber(itemID, itemsHashMap, truckPlateNum);
 		otherItems(itemsHashMap, truckPlateNum);
 
 		
-		System.out.println("Step 4/7 - Please enter the Source Address ID: ");
+		System.out.println("Step 6/7 - Please enter the Source Address ID: ");
 		source = placeExist();
 		lastSource = source;
 		
-		System.out.println("Step 5/7 - Please enter the Destination Address ID: ");
+		System.out.println("Step 7/7 - Please enter the Destination Address ID: ");
 		tmpDest=placeExist();
 		
 		if (vectorDest.contains(tmpDest) || tmpDest == source){
@@ -108,12 +116,7 @@ public class TransportMenu {
 		}
 			
 		otherDestinations (vectorDest);
-		System.out.println("Step 6/7 - Please enter the Date: (dd/mm/yy)");
-		date = day+" "+in.nextLine();
-		date = day+" "+in.nextLine();
-		System.out.println("Step 7/7 - Please enter the leaving time: (hh:mm)");
-		leavingTime = in.nextLine();
-		
+
 		@SuppressWarnings("rawtypes")
 		Enumeration en = vectorDest.elements();
 		
@@ -161,7 +164,7 @@ public class TransportMenu {
 			choice = in.nextInt();
 			switch (choice){
 			case 1:
-				System.out.println("Step 5/7 - Please enter the Destination Address ID: ");
+				System.out.println("Step 7/7 - Please enter the Destination Address ID: ");
 				
 				tmpDest=placeExist();
 				
@@ -249,7 +252,7 @@ public class TransportMenu {
 			choice = in.nextInt();
 			switch (choice){
 			case 1:
-				System.out.println("Step 3/7 - Please enter the Item ID: ");
+				System.out.println("Step 5/7 - Please enter the Item ID: ");
 				
 				tmpItem =itemExist();
 				
