@@ -1,10 +1,14 @@
 package Transport.BL;
+import Program.DriverInformations;
+
 import java.sql.*;
 import java.util.*;
 
 
 public class Truck {
 	private Connection db;
+	private static DriverInformations driverInformations;
+
 
 	public Truck(Connection db){
 		this.db=db;
@@ -258,6 +262,27 @@ public class Truck {
 		} catch (SQLException e) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		}
+	}
+
+	public Vector<String> vectorLicenceTypeAvailablesToTransport(){
+		Vector<String> ans = new Vector<String>();
+		Vector<String> driverLicenceTypesAvailables = driverInformations.getDriversTypesLicencesAvailables();
+
+		Enumeration en = driverLicenceTypesAvailables.elements();
+		while(en.hasMoreElements()){
+			boolean areEqual = false;
+			Vector<String> truckLicenceTypesAvailables = getLicencesTypesAvailables();
+			Enumeration en2 = truckLicenceTypesAvailables.elements();
+			while (!areEqual && en2.hasMoreElements()){
+				if (en.nextElement().equals(en2.nextElement())){
+					areEqual = true;
+					if (!ans.contains(en.nextElement())){
+						ans.addElement((String) en.nextElement());
+					}
+				}
+			}
+		}
+		return ans;
 	}
 
 

@@ -89,31 +89,35 @@ public class TransportMenu {
 		mainTransport.optionDone();
 	}
 
-	private void checkConditions(){
-		int confirm =-1;
+	private void checkConditions() {
+		if (Run.truck.vectorLicenceTypeAvailablesToTransport().size() > 0){
+			int confirm = -1;
 
-		while (day < 1 || day >7){
-			System.out.println("Please enter The Actual Day: ");
-			System.out.println("1- Sunday, 2- Monday, 3- Tuesday, 4-Wednesday, 5-Thursday, 6-Friday, 7-Saturday");
-			day = in.nextInt();
-		}
-		
-		if (day!=1 && day !=4){
-			while (confirm <1 || confirm >2){
-				System.out.println("Did the Stock is Out? ");
-				System.out.println("1- Yes, 2- No");
-				confirm = in.nextInt();
+			while (day < 1 || day > 7) {
+				System.out.println("Please enter The Actual Day: ");
+				System.out.println("1- Sunday, 2- Monday, 3- Tuesday, 4-Wednesday, 5-Thursday, 6-Friday, 7-Saturday");
+				day = in.nextInt();
 			}
-			if (confirm ==2){
-				System.out.println("Sorry, you can not make a Transport When the Stock is not Out");
-				mainTransport.optionDone();
-			}
-			else {
+
+			if (day != 1 && day != 4) {
+				while (confirm < 1 || confirm > 2) {
+					System.out.println("Did the Stock is Out? ");
+					System.out.println("1- Yes, 2- No");
+					confirm = in.nextInt();
+				}
+				if (confirm == 2) {
+					System.out.println("Sorry, you can not make a Transport When the Stock is not Out");
+					mainTransport.optionDone();
+				} else {
+					addTransport(day);
+				}
+			} else {
 				addTransport(day);
 			}
 		}
 		else{
-			addTransport(day);
+			System.out.println("Sorry, you don't have any Driver Available which can Drive One of our Available Truck");
+			mainTransport.optionDone();
 		}
 	}
 	
@@ -122,10 +126,6 @@ public class TransportMenu {
 		HashMap <Integer, Integer> itemsHashMap = new HashMap <Integer, Integer>();
 		LocalDate date;
 		LocalTime startTime;
-
-
-
-
 
 		int truckPlateNum, driverID, source, tmpDest, itemID, counter=0;
 		boolean ans = true, order=true, transOrder=true;
