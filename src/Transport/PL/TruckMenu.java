@@ -77,8 +77,9 @@ public class TruckMenu {
 			System.out.println("A Problem occured!");
 			mainTransport.optionDone();
 		}
-
 	}
+
+
 
 	private void removeTruck(){
 		int choice;
