@@ -25,7 +25,7 @@
     <show-object-properties value="true" />
     <loaded-nodes>
       <connection connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e">
-        <schema name="main" object-types="table, view" />
+        <schema name="main" object-types="column, constraint, index, table, dataset trigger, view" />
       </connection>
     </loaded-nodes>
   </component>
@@ -33,6 +33,12 @@
     <connection id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e">
       <console name="Connection" type="STANDARD" />
     </connection>
+  </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Employees" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.EmployeeAvailability" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Driver" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.RolesOfEmployees" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />

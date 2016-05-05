@@ -19,15 +19,22 @@ public class BL_IMPL implements IBL, DriverInformations {
     private static IDAL SQLDAL = new SQLiteDAL();
 
     @Override
-    public boolean insertEmployee(String firstName, String lastName, int id, Vector<Role> roles, LocalDate dateOfHire, String contract, String bankAcct, int[][] ava) {
+    public boolean insertEmployee(String firstName, String lastName, int id, Vector<Role> roles, LocalDate dateOfHire, String contract, String bankAcct, int[][] ava, String licenseNum, String licenseType) {
         /*check validity*/
-        if(SQLDAL.getEmployee(id)!=null) {
-
-            //create emp
-            Employee emp = new Employee(firstName, lastName, id, roles, dateOfHire, contract, bankAcct, ava);
-
-            //insert into database
-            return SQLDAL.insert(emp);
+        Employee e = SQLDAL.getEmployee(id);
+        if(e==null) {
+            //create emp, check if emp is driver or not
+            if(licenseNum.equals("")) {
+                Employee emp = new Employee(firstName, lastName, id, roles, dateOfHire, contract, bankAcct, ava);
+                //insert into database
+                return SQLDAL.insert(emp);
+            }
+            else {
+                //create driver
+                Employee emp = new Driver(firstName, lastName, id, roles, dateOfHire, contract, bankAcct, ava, licenseNum, licenseType);
+                //insert into database
+                return SQLDAL.insert(emp);
+            }
         }
         else{
             System.out.println("Employee already exists with that ID!");
@@ -36,9 +43,15 @@ public class BL_IMPL implements IBL, DriverInformations {
     }
 
     @Override
-    public boolean updateEmployee(String firstName, String lastName, int id, Vector<Role> roles, LocalDate dateOfHire, String contract, String bankAcct, int[][] ava) {
-        Employee emp = new Employee(firstName, lastName, id, roles, dateOfHire, contract, bankAcct, ava);
-        return SQLDAL.update(emp);
+    public boolean updateEmployee(String firstName, String lastName, int id, Vector<Role> roles, LocalDate dateOfHire, String contract, String bankAcct, int[][] ava, String licenseNum, String licenseType) {
+        if(licenseNum.equals("")) { //check if driver or employee
+            Employee emp = new Employee(firstName, lastName, id, roles, dateOfHire, contract, bankAcct, ava);
+            return SQLDAL.update(emp);
+        }
+        else{
+            Employee emp = new Driver(firstName, lastName, id, roles, dateOfHire, contract, bankAcct, ava, licenseNum, licenseType);
+            return SQLDAL.update(emp);
+        }
     }
 
     @Override

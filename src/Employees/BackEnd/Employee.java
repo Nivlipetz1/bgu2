@@ -35,6 +35,17 @@ public class Employee {
         availability = ava;
     }
 
+    public Employee(Employee e){
+        firstName = e.getFirstName();
+        lastName = e.getLastName();
+        id = e.getId();
+        roles = e.getRoles();
+        dateOfHire = LocalDate.parse(e.getDateOfHire(), formatterDate);
+        contract = e.getContract();
+        bankAcct = e.getBankAcct();
+        availability = e.getAvailability();
+    }
+
     public int[][] getAvailability() {
         return availability;
     }
