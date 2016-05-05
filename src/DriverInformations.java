@@ -9,9 +9,10 @@ import java.util.Vector;
  * Created by ariel on 4/5/2016.
  */
 public interface DriverInformations {
-    boolean isEmployeeAvailable (String licenceType, LocalTime time, LocalDate date);
+    // return boolean in order to know if there is an Available Driver do Drive truck with Licence type : licenceType
+    boolean isDriverAvailable (String licenceType, LocalTime time, LocalDate date);
+    // return a list with all free Drivers with licenceType
     Vector<Employee> getDriverList (String licenceType, LocalTime time, LocalDate date);
-    void setDriverBusy (int employeeID);
+    void setDriverBusy (int employeeID, LocalTime time, LocalDate date);
     boolean isStoreKeeperAvailable (LocalTime time, LocalDate date);
-    void setStoreKeeperBusy (int employeeID);
 }
