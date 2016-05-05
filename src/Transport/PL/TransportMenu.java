@@ -1,5 +1,9 @@
 package Transport.PL;
 
+import Employees.BL.BL_IMPL;
+import Employees.BL.IBL;
+import Employees.BackEnd.Driver;
+import Employees.BackEnd.Employee;
 import Program.DriverInformations;
 import Transport.BL.Run;
 
@@ -14,6 +18,7 @@ public class TransportMenu {
 	private static int lastDest;
 	private static int lastSource;
 	private static int day;
+	private static int driverID, truckPlateNum;
 	private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
 	private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
 	private static DriverInformations driverInformations;
@@ -127,7 +132,7 @@ public class TransportMenu {
 		LocalDate date;
 		LocalTime startTime;
 
-		int truckPlateNum, driverID, source, tmpDest, itemID, counter=0;
+		int source, tmpDest, itemID, counter=0;
 		boolean ans = true, order=true, transOrder=true;
 
 		System.out.println("Step 1/7 - Please enter the Date: (dd/mm/yy)");
@@ -139,8 +144,7 @@ public class TransportMenu {
 		System.out.println("Step 3/7 - Please enter a Truck Plate Number: ");
 		truckPlateNum = truckExist();
 
-
-		driverID = adjustDriver(truckPlateNum);
+		adjustDriver(truckPlateNum, startTime, date);
 
 		System.out.println("Step 5/7 - Please enter an Item ID: ");
 		itemID=itemExist();
@@ -169,7 +173,9 @@ public class TransportMenu {
 		Enumeration en = vectorDest.elements();
 		
 		int transportID = Transport.BL.Run.transport.getLastTransportId();
-		
+
+		Run.truck.setAvailability(truckPlateNum, 1); // the Truck is not Available Anymore
+
 		ans = Transport.BL.Run.transport.add(transportID, truckPlateNum, driverID, source, lastDest, date.toString(), startTime.toString());
 		if (ans){
 			while (en.hasMoreElements() && order && transOrder){
@@ -200,19 +206,74 @@ public class TransportMenu {
 
 	}
 	
-	private int adjustDriver (int truckPlateNum){
+	private void adjustDriver (int truckPlateNum, LocalTime time, LocalDate date){
+		IBL bl_impl = new BL_IMPL();
 		int driverID = -1;
 		System.out.println("One moment, we are Checking if we have Some Driver to Drive this Truck... ");
 		String licenceType = Run.truck.getLicenceType(truckPlateNum);
-		// boolean isEmployeeAvailable (licenceType, startTime, date);
-		// if (ans)
-		// Vector<Employee> driverAvailables = getDriverList (licenceType, startTime, date);
-			// if (driverAvailables.size() == 1)
-			// Employee driver = driverAvailables.get();
-			// We adjust you the driver driver.getName();
-			// setDriverBusy (driver.getID());
-			//
-		return driverID;
+		boolean isDriverAvailable = driverInformations.isDriverAvailable(licenceType, time, date);
+		if (isDriverAvailable){
+			Vector<Employee> vectorEmployee = driverInformations.getDriverList(licenceType, time, date);
+			int driversAvailablesLength = vectorEmployee.size();
+			System.out.println("Nice, "+driversAvailablesLength+" Drivers Can Drive Your Selected Truck!");
+			System.out.println();
+			if (driversAvailablesLength > 1) {
+				System.out.println("Do you want to Choose a Driver, or Do You Prefer That We Will Choose One For You?");
+				System.out.println("1- I Want to Choose, 2-Choose Automatically");
+				int choice = in.nextInt();
+				driverID=-1;
+				if (choice ==1){
+					Enumeration en = vectorEmployee.elements();
+					System.out.println("Please enter the Id of the Driver, you Want to Drive");
+					System.out.println();
+					while(en.hasMoreElements()){
+						Employee tempDriver = (Driver)en.nextElement();
+						System.out.println("ID = "+tempDriver.getId()+" FirstName:"+ tempDriver.getFirstName()+" LastName:"+tempDriver.getLastName());
+					}
+					driverID = in.nextInt();
+					if (bl_impl.idExists(driverID)){
+						System.out.println("The Driver "+bl_impl.getEmployee(driverID).getFirstName()+" "+bl_impl.getEmployee(driverID).getLastName()+" was Successfully Choosen");
+					}
+					else{
+						System.out.println("Error, The ID you Entered is Wrong");
+						driverID = -1;
+					}
+				}
+				if (driverID== -1){
+					Employee employeeToDrive = vectorEmployee.get(0);
+					driverID = employeeToDrive.getId();
+					System.out.println();
+					System.out.println("The Driver "+employeeToDrive.getFirstName()+" "+employeeToDrive.getLastName()+" was Successfully Choosen");
+				}
+			}
+			else if (driversAvailablesLength == 1){
+				Employee employeeToDrive = vectorEmployee.get(0);
+				driverID = employeeToDrive.getId();
+				System.out.println();
+				System.out.println("The Driver "+employeeToDrive.getFirstName()+" "+employeeToDrive.getLastName()+" was Successfully Choosen");
+			}
+		}
+		else{
+			System.out.println();
+			System.out.println("Sorry We don't have any Available Driver with the Type Licence Of the Truck You Choose");
+			System.out.println("Press 1 - If You want to Choose an Auther Truck");
+			System.out.println("Press 2 - If You want to Return to the Menu");
+			int choice = in.nextInt();
+			if (choice == 1){
+				chooseAnAutherTruck (time, date);
+			}
+			else {
+				System.out.println();
+				mainTransport.displayMenu();
+			}
+
+		}
+	}
+
+	public void chooseAnAutherTruck (LocalTime time, LocalDate date){
+		System.out.println("Step 3/7 - Please enter a Truck Plate Number: ");
+		truckPlateNum = truckExist();
+		adjustDriver(truckPlateNum, time, date);
 	}
 	
 	
@@ -444,46 +505,7 @@ public class TransportMenu {
 		}
 	}
 
-	private int driverExist (){
-		int driverID = in.nextInt();
-		
-		while (!Transport.BL.Run.driver.contains(driverID)){
-			System.out.println("Error the Driver ID don't exist in the DataBase");
-			int choice;
-			System.out.println();
-			System.out.println("Press 1 to enter a new Driver ID");
-			System.out.println("Press 2 to Display the Driver List");
-			System.out.println("Press 3 to Return to the Menu");
-			System.out.println("Press 4 to Exit");
 
-			choice = in.nextInt();
-			switch (choice){
-			case 1:
-				driverID = in.nextInt();
-				break;
-			case 2:
-				System.out.println();
-				Transport.BL.Run.driver.listOfDrivers();
-				System.out.println();
-				System.out.println("Please enter a Driver ID: ");
-				driverID = in.nextInt();
-				break;
-			case 3:
-				System.out.println();
-				mainTransport.displayMenu();
-				break;
-			case 4:
-				mainTransport.exit();
-			default:
-				System.out.println("Invalid input");
-				System.out.println();
-				break;
-			}
-		}
-		System.out.println("The driver "+ Transport.BL.Run.driver.getDriverName(driverID)+" was successfully selected");
-		return driverID;
-	}
-	
 
 	private int truckExist (){
 		int truckPlateNum = in.nextInt();
@@ -494,8 +516,9 @@ public class TransportMenu {
 			System.out.println();
 			System.out.println("Press 1 to enter a new Plate Number");
 			System.out.println("Press 2 to Display the Truck List");
-			System.out.println("Press 3 to Return to the Menu");
-			System.out.println("Press 4 to Exit");
+			System.out.println("Press 3 to Display the Licence Types You Can Choose (According to Availables Drivers)");
+			System.out.println("Press 4 to Return to the Menu");
+			System.out.println("Press 5 to Exit");
 
 			choice = in.nextInt();
 			switch (choice){
@@ -510,10 +533,18 @@ public class TransportMenu {
 				truckPlateNum = in.nextInt();
 				break;
 			case 3:
+				Vector<String> trucksLicencesAvailables = Run.truck.vectorLicenceTypeAvailablesToTransport();
+				Enumeration en = trucksLicencesAvailables.elements();
+				while(en.hasMoreElements()) {
+					String tempType = (String) en.nextElement();
+					System.out.println("Type: "+tempType);
+				}
+				break;
+			case 4:
 				System.out.println();
 				mainTransport.displayMenu();
 				break;
-			case 4:
+			case 5:
 				mainTransport.exit();
 			default:
 				System.out.println("Invalid input");

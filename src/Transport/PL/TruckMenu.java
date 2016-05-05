@@ -67,7 +67,7 @@ public class TruckMenu {
 			maxWeight = in.nextInt();
 		}
 
-		ans = Transport.BL.Run.truck.add(truckPlateNum, licenceType, model, color, weightNeto, maxWeight, weightNeto);
+		ans = Transport.BL.Run.truck.add(truckPlateNum, licenceType, model, color, weightNeto, maxWeight, weightNeto, 0);
 
 		if (ans){
 			System.out.println("Truck Added Successfully!");

@@ -215,7 +215,7 @@ public class Truck {
 		return ans;
 	}
 
-	public Vector <String> getLicencesTypesAvailables (){
+	public Vector <String> getLicencesTypes (){
 		Vector<String> ans= new Vector<String>();
 		try {
 			Statement st=db.createStatement();
@@ -271,7 +271,7 @@ public class Truck {
 		Enumeration en = driverLicenceTypesAvailables.elements();
 		while(en.hasMoreElements()){
 			boolean areEqual = false;
-			Vector<String> truckLicenceTypesAvailables = getLicencesTypesAvailables();
+			Vector<String> truckLicenceTypesAvailables = getLicencesTypes();
 			Enumeration en2 = truckLicenceTypesAvailables.elements();
 			while (!areEqual && en2.hasMoreElements()){
 				if (en.nextElement().equals(en2.nextElement())){
