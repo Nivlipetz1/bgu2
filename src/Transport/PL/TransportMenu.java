@@ -1,5 +1,6 @@
 package Transport.PL;
 
+import Program.DriverInformations;
 import Transport.BL.Run;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class TransportMenu {
 	private static int day;
 	private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
 	private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
+	private static DriverInformations driverInformations;
 
 
 	public TransportMenu(MainTransport mainTransport){
@@ -62,15 +64,29 @@ public class TransportMenu {
 		startTime = LocalTime.parse(in.next(), timeFormatter);
 
 		System.out.println("Just a moment, we are checking with the Department Employee if a Store Keeper is Available to get the Transport");
-		/// timer
-		/// boolean isStoreKeeperAvailable (startTime, date);
-		/// if true
-
-		System.out.println("OK, we can take the Transport!");
-
-		System.out.println("Sorry, none of our Store Keeper is Available to get the Transport!");
+		boolean canGetTransport = driverInformations.isStoreKeeperAvailable(startTime, date);
+		if (canGetTransport){
+			System.out.println("Ok, we have a Store Keeper to Receive the Transport!");
+			System.out.println();
+			System.out.println("Do the Truck is Super-Lee's Truck?");
+			System.out.println("1-Yes, 2-No");
+			int choice = in.nextInt();
+			if (choice ==1){
+				System.out.println("Please enter the licence Number of the Truck");
+				int truckPlateNum = in.nextInt();
+				if (Run.truck.contains(truckPlateNum)){
+					Run.truck.setAvailability(truckPlateNum, 0);
+					System.out.println("Ok, we Successfully register the Truck Back");
+				}
+				else{
+					System.out.println("Sorry, the Licence Num is not a part of our DataBase");
+				}
+			}
+		}
+		else {
+			System.out.println("Sorry, none of our Store Keeper is Available to get the Transport!");
+		}
 		mainTransport.optionDone();
-
 	}
 
 	private void checkConditions(){
