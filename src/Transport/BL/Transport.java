@@ -13,10 +13,10 @@ public class Transport {
 		int ans=-2;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT transportID FROM Transport";
+			String sql="SELECT ID FROM Transport";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				ans = rs.getInt("transportID");
+				ans = rs.getInt("ID");
 			}
 			rs.close();
 			st.close();
@@ -33,7 +33,7 @@ public class Transport {
 		boolean ans=true;
 			try {
 				Statement st=db.createStatement();
-				String sql="INSERT INTO Transport (transportID,truckPlateNum,driverID,sourceID,destID,date,leavingTime)"+
+				String sql="INSERT INTO Transport (ID,TruckPlateNum,DriverID,SourceID,DestID,Date,LeavingTime)"+
 						" VALUES("+transportID+","+truckPlateNum+","+
 						driverID+","+source+","+dest+",'"+date+"','"+leavingTime+"');";
 				if(st.executeUpdate(sql)==0) ans=false;
@@ -53,7 +53,7 @@ public class Transport {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="DELETE from Transport where transportID="+transportID+";";
+			String sql="DELETE from Transport where ID="+transportID+";";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 
@@ -70,7 +70,7 @@ public class Transport {
 		boolean ans = true;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT transportID FROM Transport WHERE transportID = "+transportID+";";
+			String sql="SELECT ID FROM Transport WHERE ID = "+transportID+";";
 			ResultSet rs = st.executeQuery(sql);
 			if(!rs.next()) ans=false;
 			st.close();
@@ -131,18 +131,18 @@ public class Transport {
 			String sql="SELECT * FROM Transport";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				System.out.println("TransportID = "+rs.getInt("transportID"));
-				System.out.println("Truck Plate Number = "+rs.getInt("truckPlateNum"));
-				System.out.println("DriverID = "+rs.getInt("driverID"));
+				System.out.println("TransportID = "+rs.getInt("ID"));
+				System.out.println("Truck Plate Number = "+rs.getInt("TruckPlateNum"));
+				System.out.println("DriverID = "+rs.getInt("DriverID"));
 				
-				System.out.println("Driver Name = "+Run.driver.getDriverName(rs.getInt("driverID")));
+				System.out.println("Driver Name = "+Run.driver.getDriverName(rs.getInt("DriverID")));
 
-				System.out.println("SourceID = "+Run.place.getAddressName(rs.getInt("sourceID")));
+				System.out.println("SourceID = "+Run.place.getAddressName(rs.getInt("SourceID")));
 			
-				System.out.println("DestinationID = "+Run.place.getAddressName(rs.getInt("destID")));
+				System.out.println("DestinationID = "+Run.place.getAddressName(rs.getInt("DestID")));
 
-				System.out.println("Date = "+rs.getInt("date"));
-				System.out.println("LeavingTime = "+rs.getString("leavingTime"));
+				System.out.println("Date = "+rs.getInt("Date"));
+				System.out.println("LeavingTime = "+rs.getString("LeavingTime"));
 				System.out.println();
 			}
 			rs.close();

@@ -13,7 +13,7 @@ public class Item {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="INSERT INTO Item(itemID,itemName,weight)"+
+			String sql="INSERT INTO Item(ID,Name,Weight)"+
 						" VALUES("+itemID+",'"+itemName+"',"+weight+");";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
@@ -30,7 +30,7 @@ public class Item {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="DELETE from Item where itemID="+itemID+";";
+			String sql="DELETE from Item where ID="+itemID+";";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 			
@@ -47,9 +47,9 @@ public class Item {
 			String sql="SELECT * FROM Item";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				System.out.println("ItemID = "+rs.getInt("itemID"));
-				System.out.println("Item Name = "+rs.getString("itemName"));
-				System.out.println("Item Weight = "+rs.getInt("weight"));
+				System.out.println("ItemID = "+rs.getInt("ID"));
+				System.out.println("Item Name = "+rs.getString("Name"));
+				System.out.println("Item Weight = "+rs.getInt("Weight"));
 
 				System.out.println();
 			}
@@ -65,9 +65,9 @@ public class Item {
 		int weight=0;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT weight FROM Item WHERE itemID = "+itemID+";";
+			String sql="SELECT Weight FROM Item WHERE ID = "+itemID+";";
 			ResultSet rs =st.executeQuery(sql);
-			weight = rs.getInt("weight");
+			weight = rs.getInt("Weight");
 			rs.close();
 			st.close();
 		} catch (SQLException e) {
@@ -81,9 +81,9 @@ public class Item {
 		String ans=null;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT itemName FROM Item WHERE itemID = "+itemID+";";
+			String sql="SELECT Name FROM Item WHERE ID = "+itemID+";";
 			ResultSet rs =st.executeQuery(sql);
-			ans = rs.getString("itemName");
+			ans = rs.getString("Name");
 			rs.close();
 			st.close();
 		} catch (SQLException e) {
@@ -97,7 +97,7 @@ public class Item {
 		boolean ans = true;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT itemID FROM Item WHERE itemID = "+itemID+";";
+			String sql="SELECT ID FROM Item WHERE ID = "+itemID+";";
 			ResultSet rs = st.executeQuery(sql);
 			if(!rs.next()) ans=false;
 			st.close();

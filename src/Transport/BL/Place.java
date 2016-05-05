@@ -14,10 +14,10 @@ public class Place {
 		int ans=-2;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT addressID FROM Place ";
+			String sql="SELECT ID FROM Place ";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				ans = rs.getInt("addressID");
+				ans = rs.getInt("ID");
 			}
 			rs.close();
 			st.close();
@@ -31,7 +31,7 @@ public class Place {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="INSERT INTO Place(addressID,address,phoneNum,contactName)"+
+			String sql="INSERT INTO Place(ID,Address,PhoneNum,ContactName)"+
 						" VALUES("+addressID+",'"+address+"',"+phoneNum+",'"+contactName+"');";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
@@ -48,7 +48,7 @@ public class Place {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="DELETE from Place where addressID="+addressID+";";
+			String sql="DELETE from Place where ID="+addressID+";";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 			
@@ -65,10 +65,10 @@ public class Place {
 			String sql="SELECT * FROM Place";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				System.out.println("AddressID = "+rs.getInt("addressID"));
-				System.out.println("Address = "+rs.getString("address"));
-				System.out.println("Contact Name = "+rs.getString("contactName"));
-				System.out.println("Contact Name Number = "+rs.getString("phoneNum"));
+				System.out.println("AddressID = "+rs.getInt("ID"));
+				System.out.println("Address = "+rs.getString("Address"));
+				System.out.println("Contact Name = "+rs.getString("ContactName"));
+				System.out.println("Contact Name Number = "+rs.getString("PhoneNum"));
 				System.out.println();
 			}
 			rs.close();
@@ -83,7 +83,7 @@ public class Place {
 		boolean ans = true;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT addressID FROM Place WHERE addressID = "+addressID+";";
+			String sql="SELECT ID FROM Place WHERE ID = "+addressID+";";
 			ResultSet rs = st.executeQuery(sql);
 			if(!rs.next()) ans=false;
 			st.close();
@@ -99,9 +99,9 @@ public class Place {
 		String ans=null;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT address FROM Place WHERE addressID = "+addressID+";";
+			String sql="SELECT Address FROM Place WHERE ID = "+addressID+";";
 			ResultSet rs =st.executeQuery(sql);
-			ans = rs.getString("address");
+			ans = rs.getString("Address");
 			rs.close();
 			st.close();
 		} catch (SQLException e) {

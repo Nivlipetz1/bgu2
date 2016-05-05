@@ -13,8 +13,8 @@ public class Driver {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="INSERT INTO Driver(driverID,name,licenceNum,licenceType)"+
-						" VALUES("+id+",'"+name+"',"+
+			String sql="INSERT INTO Driver(ID,LicenceNum,LicenceType)"+
+						" VALUES("+id+","+
 						licenceNum+",'"+licenceType+"');";
 			if(st.executeUpdate(sql)==0) ans=false;
 			
@@ -32,7 +32,7 @@ public class Driver {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="DELETE from Driver where driverID="+id+";";
+			String sql="DELETE from Driver where ID="+id+";";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 			
@@ -49,10 +49,10 @@ public class Driver {
 			String sql="SELECT * FROM Driver";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				System.out.println("DriverID = "+rs.getInt("driverID"));
+				System.out.println("ID = "+rs.getInt("ID"));
 				System.out.println("Name = "+rs.getString("name"));
-				System.out.println("LicenceNum = "+rs.getInt("licenceNum"));
-				System.out.println("LicenceType = "+rs.getString("licenceType"));
+				System.out.println("LicenceNum = "+rs.getInt("LicenceNum"));
+				System.out.println("LicenceType = "+rs.getString("LicenceType"));
 				System.out.println();
 			}
 			rs.close();
@@ -63,11 +63,11 @@ public class Driver {
 		}
 	}
 	
-	public String getDriverName (int driverID){
+	public String getDriverName (int ID){
 		String ans=null;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT name FROM Driver WHERE driverID = "+driverID+";";
+			String sql="SELECT name FROM Driver WHERE ID = "+ID+";";
 			ResultSet rs =st.executeQuery(sql);
 			ans = rs.getString("name");
 			rs.close();
@@ -83,7 +83,7 @@ public class Driver {
 		boolean ans = true;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT driverID FROM Driver WHERE driverID = "+driverID+";";
+			String sql="SELECT ID FROM Driver WHERE ID = "+driverID+";";
 			ResultSet rs = st.executeQuery(sql);
 			if(!rs.next()) ans=false;
 			st.close();
