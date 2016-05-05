@@ -1,5 +1,6 @@
 package Transport.BL;
 import java.sql.*;
+import java.util.*;
 
 
 public class Truck {
@@ -8,7 +9,8 @@ public class Truck {
 	public Truck(Connection db){
 		this.db=db;
 	}
-	
+
+	//available
 	public boolean add(int truckPlateNum,String licenceType,String model,String color,double weightNeto,double maxWeight, double actualWeight){
 		boolean ans=true;
 		try {
@@ -192,6 +194,42 @@ public class Truck {
 		}
 		return ans;
 	}
+
+	public String getLicenceType (int truckPlateNum){
+		String ans="";
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT licenceType FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			ResultSet rs = st.executeQuery(sql);
+
+			ans = rs.getString("licenceType");
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		return ans;
+	}
+
+	public Vector <String> getLicencesTypesAvailables (){
+		Vector<String> ans= new Vector<String>();
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT licenceType FROM Truck;";
+			ResultSet rs = st.executeQuery(sql);
+			while (rs.next()){
+				ans.add(rs.getString("licenceType"));
+			}
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		return ans;
+	}
+
+
+
 	
 	public boolean removeWeight (int truckPlateNum, int itemID, int amount){
 		boolean ans = false;
