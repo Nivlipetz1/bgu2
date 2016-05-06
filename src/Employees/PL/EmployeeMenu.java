@@ -339,6 +339,12 @@ public class EmployeeMenu {
                         else if(rolesDictionary.containsKey(roleChosen)){ //make sure choice is valid
                             //remove from the employee's roles vector
                             System.out.println(emp.getRoles().get(roleChosen-1).getName() + " removed." );
+
+                            //delete driver
+                            if(emp.getRoles().get(roleChosen-1).getName().equals("Driver")){
+
+                            }
+
                             emp.getRoles().remove(roleChosen-1);
                         }
                         else{
