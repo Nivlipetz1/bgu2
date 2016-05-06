@@ -2,6 +2,7 @@ package Employees.PL;
 
 import Employees.BL.*;
 import Employees.BackEnd.*;
+import Program.DriverInformations;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,6 +21,7 @@ public class ShiftMenu {
     private static HashMap<Integer,Role> rolesDictionary = new HashMap<Integer, Role>();
 
 
+
     public static void run() {
         boolean switchCase = false;
 
@@ -29,7 +31,8 @@ public class ShiftMenu {
                 rolesDictionary.put(r.getID(), r);
             }
         }
-
+        DriverInformations di = new BL_IMPL();
+        System.out.println(di.isStoreKeeperAvailable(LocalTime.parse("17:00",timeFormatter),LocalDate.parse("08/05/2016",dateFormatter)));
         System.out.println("Welcome to Shift menu");
         System.out.println("1. Add Shift");
         System.out.println("2. Edit/Delete Shift");
@@ -256,9 +259,9 @@ public class ShiftMenu {
                     availableEmployeesBasedOnRole.remove(0);
                 }
 
-                for(int e=0;e<availableEmployees.size();e++){
+                /*for(int e=0;e<availableEmployees.size();e++){
                     availableEmployees.remove(0);
-                }
+                }*/
             }
         }
 

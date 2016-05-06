@@ -296,7 +296,7 @@ public class BL_IMPL implements IBL, DriverInformations {
         boolean storeKeeperAvailable=false;
 
         for(Pair p: curShift.getRoles()){
-            if(p.getRole().getName()=="StoreKeeper")
+            if(p.getRole().getName().equals("StoreKeeper"))
                 storeKeeperAvailable=true;
         }
 
