@@ -27,6 +27,12 @@ public class Driver extends Employee {
         this.licenseNumber = d.getLicenseNumber();
     }
 
+    public Driver(Employee d, String licenseType, String licenseNumber) {
+        super(d.getFirstName(), d.getLastName(), d.getId(), d.getRoles(), LocalDate.parse(d.getDateOfHire(),formatter) , d.getContract(), d.getBankAcct(), d.getAvailability());
+        this.licenseType  = licenseType;
+        this.licenseNumber = licenseNumber;
+    }
+
 
 
 
