@@ -439,8 +439,8 @@ public class SQLiteDAL implements IDAL{
                 stat = db.createStatement();
                 String sql = "SELECT * FROM Driver WHERE ID="+id;
                 set = stat.executeQuery(sql);
-                String licenseType = set.getString("LicenseType");
-                String licenseNum = String.valueOf(set.getInt("LicenseNum"));
+                String licenseType = set.getString("LicenceType");
+                String licenseNum = String.valueOf(set.getInt("LicenceNum"));
                 set.close();
                 stat.close();
                 Driver driver = new Driver(emp,licenseType,licenseNum);
@@ -448,7 +448,7 @@ public class SQLiteDAL implements IDAL{
             }
         }
         catch (SQLException e){
-
+            System.out.println(e);
         }
         return null;
     }
