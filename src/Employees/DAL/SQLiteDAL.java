@@ -1,17 +1,16 @@
 package Employees.DAL;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import Employees.BackEnd.*;
+import Employees.BackEnd.Driver;
+import org.sqlite.SQLiteDataSource;
+
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-
-
-import Employees.BackEnd.*;
-import org.sqlite.SQLiteDataSource;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Set;
+import java.util.Vector;
 
 public class SQLiteDAL implements IDAL{
 
@@ -489,10 +488,10 @@ public class SQLiteDAL implements IDAL{
         }
     }
 
-    public boolean deleteDriver(Driver driver){
+    public boolean deleteDriver(int id){
         try{
             String sql = "Delete From Driver " +
-                    "Where ID="+driver.getId();
+                    "Where ID="+id;
             stat = db.createStatement();
             int rows = stat.executeUpdate(sql);
             stat.close();
@@ -629,7 +628,7 @@ public class SQLiteDAL implements IDAL{
             int rows = stat.executeUpdate(sql);
             stat.close();
             if(emp instanceof Driver){
-                deleteDriver((Driver)emp);
+                deleteDriver(emp.getId());
             }
             return rows>0;
 
