@@ -168,7 +168,7 @@ public class EmployeeMenu {
             licenseNum = sc.next();
 
             System.out.println("Please enter license type:");
-            licenseType = sc.next();
+            licenseType = sc.next().toUpperCase();
         }
 
         boolean result = bl_impl.insertEmployee(fName, lName, ID, roles, date, contract, bankAcct, avail, licenseNum, licenseType);
@@ -272,7 +272,7 @@ public class EmployeeMenu {
                         ((Driver)emp).setLicenseNumber(sc.next());
 
                         System.out.println("Insert Employee's license type: (Current: "+((Driver)emp).getLicenseType()+" )");
-                        ((Driver)emp).setLicenseType(sc.next());
+                        ((Driver)emp).setLicenseType(sc.next().toUpperCase());
 
                         bl_impl.updateEmployee(fName, lName, emp.getId(), emp.getRoles(), date, contract, bankAcct, emp.getAvailability(), ((Driver)emp).getLicenseNumber(), ((Driver)emp).getLicenseType());
                     }

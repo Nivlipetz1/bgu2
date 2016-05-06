@@ -23,12 +23,7 @@ public class ShiftMenu {
     public static void run() {
         boolean switchCase = false;
 
-        //fill in the rolesDicationary
-        if(bl_impl.getRoles().size()>0) {
-            for (Role r : bl_impl.getRoles()) {
-                rolesDictionary.put(r.getID(), r);
-            }
-        }
+        fillRoles();
 
         System.out.println("Welcome to Shift menu");
         System.out.println("1. Add Shift");
@@ -159,9 +154,11 @@ public class ShiftMenu {
         while(!finishedRoles) {
             System.out.println("Choose a role, if done press 0:");
             /*list roles*/
-            for (z = 1; z <= rolesDictionary.size(); z++) {
-                System.out.println(z + ": " + rolesDictionary.get(z).getName());
-            }  //TODO
+            fillRoles();
+            for(int f : rolesDictionary.keySet()){
+                System.out.println(f + ": " + rolesDictionary.get(f).getName());
+            }
+
             roleChosen = sc.nextInt();
 
             if (roleChosen == 0) {
@@ -250,15 +247,18 @@ public class ShiftMenu {
 
                     counter++;
                 }
+
                 counter=0;
+
 
                 for(int e=0;e<availableEmployeesBasedOnRole.size();e++){
                     availableEmployeesBasedOnRole.remove(0);
                 }
-
+                /*
                 for(int e=0;e<availableEmployees.size();e++){
                     availableEmployees.remove(0);
-                }
+                }*/
+
             }
         }
 
@@ -515,12 +515,7 @@ public class ShiftMenu {
                         break;
 
                     case 3:
-                        //fill in the rolesDicationary
-                        if(bl_impl.getRoles().size()>0) {
-                            for (Role r : bl_impl.getRoles()) {
-                                rolesDictionary.put(r.getID(), r);
-                            }
-                        }
+                        fillRoles();
 
                         for(int f : rolesDictionary.keySet()){
                             System.out.println(f + ": " + rolesDictionary.get(f).getName());
@@ -646,8 +641,19 @@ public class ShiftMenu {
         else{
             System.out.println("No Shifts Found For "+date.format(dateFormatter));
         }
-
     }
+
+    private static void fillRoles(){
+        //fill in the rolesDicationary
+        rolesDictionary.clear();
+        if(bl_impl.getRoles().size()>0) {
+            for (Role r : bl_impl.getRoles()) {
+                rolesDictionary.put(r.getID(), r);
+                //lineIndex++;
+            }
+        }
+    }
+
 }
 
 
