@@ -433,7 +433,19 @@ public class SQLiteDAL implements IDAL{
             int[][] availability = getAvailability(id);
             Employee emp = new Employee(firstName,lastName,
                     id,roles,dateOfHire,contract,bankAccount,availability);
-            return emp;
+            if(!isDriver(id))
+                return emp;
+            else{
+                stat = db.createStatement();
+                String sql = "SELECT * FROM Driver WHERE ID="+id;
+                set = stat.executeQuery(sql);
+                String licenseType = set.getString("LicenseType");
+                String licenseNum = String.valueOf(set.getInt("LicenseNum"));
+                set.close();
+                stat.close();
+                Driver driver = new Driver(emp,licenseType,licenseNum);
+                return driver;
+            }
         }
         catch (SQLException e){
 
@@ -462,11 +474,13 @@ public class SQLiteDAL implements IDAL{
 
     private boolean insertDriver(Driver driver){
         try{
-            String sql = "INSERT INTO Driver " +
-                    "VALUES ("+driver.getId()+","+driver.getLicenceNumber()+",'"+driver.getLicenceType()+"')";
-            stat = db.createStatement();
-            int rows = stat.executeUpdate(sql);
-            stat.close();
+            String sql = "INSERT INTO Driver VALUES (?,?,?)";
+            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat.setInt(1,driver.getId());
+            preStat.setInt(2,Integer.parseInt(driver.getLicenseNumber()));
+            preStat.setString(3,driver.getLicenseType());
+            int rows = preStat.executeUpdate();
+            preStat.close();
             return rows==1;
         }
         catch(Exception e){
@@ -496,8 +510,8 @@ public class SQLiteDAL implements IDAL{
                     "Set LicenceNum=?, LicenceType=? " +
                     "Where ID=?";
             PreparedStatement stat = db.prepareStatement(sql);
-            stat.setInt(1,Integer.parseInt(driver.getLicenceNumber()));
-            stat.setString(2,driver.getLicenceType());
+            stat.setInt(1,Integer.parseInt(driver.getLicenseNumber()));
+            stat.setString(2,driver.getLicenseType());
             stat.setInt(3,driver.getId());
             int rows = stat.executeUpdate(sql);
             stat.close();
@@ -569,6 +583,9 @@ public class SQLiteDAL implements IDAL{
                 addRole(r.getID(), emp.getId());
             }
             employeeAvailability(emp);
+            if(emp instanceof Driver){
+                insertDriver((Driver)emp);
+            }
         }
         catch(Exception e){
             System.out.print("insert employee");
@@ -611,6 +628,9 @@ public class SQLiteDAL implements IDAL{
             stat = db.createStatement();
             int rows = stat.executeUpdate(sql);
             stat.close();
+            if(emp instanceof Driver){
+                deleteDriver((Driver)emp);
+            }
             return rows>0;
 
         }catch (Exception e){
@@ -647,6 +667,9 @@ public class SQLiteDAL implements IDAL{
                 if (!roleExists(emp.getId(),role,"rolesOfEmployees","EmployeeID")){
                     addRole(role.getID(),emp.getId());
                 }
+            }
+            if(emp instanceof Driver){
+                updateDriver((Driver)emp);
             }
             return (rowsAffected==1);
 
@@ -797,18 +820,26 @@ public class SQLiteDAL implements IDAL{
     }
 
     @Override
-    public Shift getShift(LocalDate d, LocalTime startTime) {
+    public Shift getShift(LocalDate d, LocalTime time) {
         try{
             stat = db.createStatement();
-            ResultSet set = stat.executeQuery("SELECT ID FROM Shifts " +
-                    "WHERE Date='"+d.format(formatterDate)+"' AND StartTime='"+startTime.format(formatterTime)+"'");
-            int id = set.getInt("ID");
+            ResultSet set = stat.executeQuery("SELECT * FROM Shifts " +
+                    "WHERE Date='"+d.format(formatterDate)+"' ");
+            int id = -1;
+            while(set.next()){
+                LocalTime start = LocalTime.parse(set.getString("StartTime"),formatterTime);
+                LocalTime end = LocalTime.parse(set.getString("EndTime"),formatterTime);
+                id = set.getInt("ID");
+                if(time.isAfter(start)&&time.isBefore(end))
+                    break;
+                            }
             set.close();
             stat.close();
             Shift shift = getShift(id);
             return shift;
         }
         catch (SQLException e){
+            System.out.println(e);
             return null;
         }
     }
@@ -835,4 +866,20 @@ public class SQLiteDAL implements IDAL{
         }
         return vec;
     }
+
+    public boolean isDriver(int id){
+        try{
+            stat = db.createStatement();
+            String sql = "SELECT * FROM Driver WHERE ID="+id;
+            ResultSet set = stat.executeQuery(sql);
+            boolean ans = set.next();
+            set.close();
+            stat.close();
+            return ans;
+        }
+        catch (SQLException e){
+            return false;
+        }
+    }
+
 }

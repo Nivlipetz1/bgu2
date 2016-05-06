@@ -31,7 +31,7 @@ public class BL_IMPL implements IBL, DriverInformations {
             }
             else {
                 //create driver
-                Employee emp = new Driver(firstName, lastName, id, roles, dateOfHire, contract, bankAcct, ava, licenseNum, licenseType);
+                Employee emp = new Driver(firstName, lastName, id, roles, dateOfHire, contract, bankAcct, ava, licenseType, licenseNum);
                 //insert into database
                 return SQLDAL.insert(emp);
             }
@@ -234,10 +234,7 @@ public class BL_IMPL implements IBL, DriverInformations {
         //get list of drivers available for this shift
         for(Employee e : getAvailableEmployees(getShiftDay(date, time))) {
             //check if employee is driver
-            for (Role r : e.getRoles()) {
-                if (r.getName() == "Driver")
-                    employeeIsDriver = true;
-            }
+                    employeeIsDriver = SQLDAL.isDriver(e.getId());
 
             if (employeeIsDriver) {
                 //make sure employee not in shift
