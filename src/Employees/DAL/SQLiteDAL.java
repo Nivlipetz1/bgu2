@@ -489,10 +489,10 @@ public class SQLiteDAL implements IDAL{
         }
     }
 
-    public boolean deleteDriver(Driver driver){
+    public boolean deleteDriver(int id){
         try{
             String sql = "Delete From Driver " +
-                    "Where ID="+driver.getId();
+                    "Where ID="+id;
             stat = db.createStatement();
             int rows = stat.executeUpdate(sql);
             stat.close();
@@ -629,7 +629,7 @@ public class SQLiteDAL implements IDAL{
             int rows = stat.executeUpdate(sql);
             stat.close();
             if(emp instanceof Driver){
-                deleteDriver((Driver)emp);
+                deleteDriver(emp.getId());
             }
             return rows>0;
 
