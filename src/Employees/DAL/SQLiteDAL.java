@@ -1,5 +1,9 @@
 package Employees.DAL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -456,6 +460,57 @@ public class SQLiteDAL implements IDAL{
         return array;
     }
 
+    private boolean insertDriver(Driver driver){
+        try{
+            String sql = "INSERT INTO Driver " +
+                    "VALUES ("+driver.getId()+","+driver.getLicenceNumber()+",'"+driver.getLicenceType()+"')";
+            stat = db.createStatement();
+            int rows = stat.executeUpdate(sql);
+            stat.close();
+            return rows==1;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    private boolean deleteDriver(Driver driver){
+        try{
+            String sql = "Delete From Driver " +
+                    "Where ID="+driver.getId();
+            stat = db.createStatement();
+            int rows = stat.executeUpdate(sql);
+            stat.close();
+            return rows>0;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    private boolean updateDriver(Driver driver){
+        try{
+            String sql = "UPDATE Driver " +
+                    "Set LicenceNum=?, LicenceType=? " +
+                    "Where ID=?";
+            PreparedStatement stat = db.prepareStatement(sql);
+            stat.setInt(1,Integer.parseInt(driver.getLicenceNumber()));
+            stat.setString(2,driver.getLicenceType());
+            stat.setInt(3,driver.getId());
+            int rows = stat.executeUpdate(sql);
+            stat.close();
+            return rows==1;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return false;
+        }
+    }
+
+
+
     private Vector<Role> getEmployeeRoles(int id){
         Vector<Role> vec = new Vector<>();
         Vector<Integer> roleIDs = new Vector<>();
@@ -756,5 +811,28 @@ public class SQLiteDAL implements IDAL{
         catch (SQLException e){
             return null;
         }
+    }
+
+    @Override
+    public Vector<Driver> getDriversList() {
+        Vector<Employee> employees = getEmployees();
+        Vector<Driver> vec = new Vector<>();
+        String sql = "SELECT * FROM Driver " +
+                "WHERE ID=?";
+        try {
+                PreparedStatement prep = db.prepareStatement(sql);
+                for(Employee emp: employees) {
+                    prep.setInt(1,emp.getId());
+                    ResultSet set = prep.executeQuery();
+                    if(set.next()){
+                        Driver driver = new Driver(emp,set.getString("LicenceType"),String.valueOf(set.getInt("LicenceNum")));
+                        vec.add(driver);
+                    }
+                }
+            }
+        catch (SQLException e){
+            System.out.println(e);
+        }
+        return vec;
     }
 }
