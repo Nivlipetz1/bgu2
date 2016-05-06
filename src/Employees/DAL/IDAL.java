@@ -37,6 +37,7 @@ public interface IDAL {
     Shift getShift(LocalDate d, LocalTime startTime);
     Vector<Driver> getDriversList();
     boolean isDriver(int id);
+    boolean deleteDriver(int id);
 
 
 

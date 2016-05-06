@@ -342,7 +342,7 @@ public class EmployeeMenu {
 
                             //delete driver
                             if(emp.getRoles().get(roleChosen-1).getName().equals("Driver")){
-
+                                bl_impl.deleteDriver(emp.getId());
                             }
 
                             emp.getRoles().remove(roleChosen-1);

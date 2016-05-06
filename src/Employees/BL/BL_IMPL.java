@@ -42,6 +42,10 @@ public class BL_IMPL implements IBL, DriverInformations {
         }
     }
 
+    public boolean deleteDriver(int id){
+        return SQLDAL.deleteDriver(id);
+    }
+
     @Override
     public boolean updateEmployee(String firstName, String lastName, int id, Vector<Role> roles, LocalDate dateOfHire, String contract, String bankAcct, int[][] ava, String licenseNum, String licenseType) {
         if(licenseNum.equals("")) { //check if driver or employee
