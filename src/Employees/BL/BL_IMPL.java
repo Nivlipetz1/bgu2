@@ -271,14 +271,14 @@ public class BL_IMPL implements IBL, DriverInformations {
         Shift curShift = SQLDAL.getShift(date, time);
         //add new pair <Driver, Employee> into the roles of the shift
         //id of driver role is 99
-        curShift.getRoles().add(new Pair(getRole(99), getEmployee(employeeID)));
-        if(curShift.getAmountOfRoles().containsKey(99)){
+        curShift.getRoles().add(new Pair(getRole(3), getEmployee(employeeID)));
+        if(curShift.getAmountOfRoles().containsKey(3)){
             //increase amount of Drivers by 1
-            curShift.getAmountOfRoles().replace(99, curShift.getAmountOfRoles().get(99)+1);
+            curShift.getAmountOfRoles().replace(3, curShift.getAmountOfRoles().get(3)+1);
         }
         else{
             //add 1 driver to amount of roles
-            curShift.getAmountOfRoles().put(99, 1);
+            curShift.getAmountOfRoles().put(3, 1);
         }
 
         boolean result = SQLDAL.update(curShift);
@@ -296,7 +296,7 @@ public class BL_IMPL implements IBL, DriverInformations {
         boolean storeKeeperAvailable=false;
 
         for(Pair p: curShift.getRoles()){
-            if(p.getRole().getName()=="StoreKeeper")
+            if(p.getRole().getName().equals("StoreKeeper"))
                 storeKeeperAvailable=true;
         }
 
@@ -315,7 +315,7 @@ public class BL_IMPL implements IBL, DriverInformations {
 
             //check if employee is driver
             for (Role r : e.getRoles()) {
-                if (r.getName() == "Driver")
+                if (r.getName().equals("Driver"))
                     employeeIsDriver = true;
             }
 
