@@ -1,23 +1,27 @@
 package Transport.BL;
+import Program.DriverInformations;
+
 import java.sql.*;
 import java.util.*;
 
 
 public class Truck {
 	private Connection db;
+	private static DriverInformations driverInformations;
+
 
 	public Truck(Connection db){
 		this.db=db;
 	}
 
-	//available
-	public boolean add(int truckPlateNum,String licenceType,String model,String color,double weightNeto,double maxWeight, double actualWeight){
+	//available 0=Available, 1=Busy
+	public boolean add(int truckPlateNum,String licenceType,String model,String color,double weightNeto,double maxWeight, double actualWeight, int available){
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="INSERT INTO Truck(TruckPlateNum,LicenceType,Model,Color,WeightNeto,MaxWeight,ActualWeight)"+
+			String sql="INSERT INTO Truck(TruckPlateNum,LicenceType,Model,Color,WeightNeto,MaxWeight,ActualWeight,Available)"+
 					" VALUES("+truckPlateNum+",'"+licenceType+"','"+
-					model+"','"+color+"',"+weightNeto+","+maxWeight+","+weightNeto+");";
+					model+"','"+color+"',"+weightNeto+","+maxWeight+","+weightNeto+", 0);";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 		} catch (SQLException e) {
@@ -199,7 +203,7 @@ public class Truck {
 		String ans="";
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT licenceType FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql="SELECT LicenceType FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
 			ResultSet rs = st.executeQuery(sql);
 
 			ans = rs.getString("licenceType");
@@ -211,11 +215,11 @@ public class Truck {
 		return ans;
 	}
 
-	public Vector <String> getLicencesTypesAvailables (){
+	public Vector <String> getLicencesTypes (){
 		Vector<String> ans= new Vector<String>();
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT licenceType FROM Truck;";
+			String sql="SELECT LicenceType FROM Truck;";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
 				ans.add(rs.getString("licenceType"));
@@ -228,6 +232,58 @@ public class Truck {
 		return ans;
 	}
 
+	public boolean isTruckAvailable (int truckPlateNum){
+		boolean ans = false;
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT Available FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
+			ResultSet rs = st.executeQuery(sql);
+
+			int isAvailable = rs.getInt("Available");
+
+			ans = (isAvailable == 0);
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+			ans = false;
+		}
+		return ans;
+	}
+
+	public  void setAvailability (int truckPlateNum, int available){
+		try {
+			Statement st2=db.createStatement();
+			String sql2="UPDATE Truck SET Available = "+available +" WHERE TruckPlateNum = "+truckPlateNum+";";
+			PreparedStatement pstmt = db.prepareStatement(sql2);
+			pstmt.executeUpdate();
+			st2.close();
+
+		} catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+	}
+
+	public Vector<String> vectorLicenceTypeAvailablesToTransport(){
+		Vector<String> ans = new Vector<String>();
+		Vector<String> driverLicenceTypesAvailables = driverInformations.getDriversTypesLicencesAvailables();
+
+		Enumeration en = driverLicenceTypesAvailables.elements();
+		while(en.hasMoreElements()){
+			boolean areEqual = false;
+			Vector<String> truckLicenceTypesAvailables = getLicencesTypes();
+			Enumeration en2 = truckLicenceTypesAvailables.elements();
+			while (!areEqual && en2.hasMoreElements()){
+				if (en.nextElement().equals(en2.nextElement())){
+					areEqual = true;
+					if (!ans.contains(en.nextElement())){
+						ans.addElement((String) en.nextElement());
+					}
+				}
+			}
+		}
+		return ans;
+	}
 
 
 	
