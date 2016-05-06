@@ -131,7 +131,7 @@ public class TransportTests extends TestCase {
 	
 	@Test
 	public void testAddTruck (){
-		ans = truck.add(102939, "A", "mercedes", "blue", 200000.0, 300000.0,20000);
+		ans = truck.add(102939, "A", "mercedes", "blue", 200000.0, 300000.0,20000, 0);
 		assertTrue(ans);
 		ans =truck.contains(102939);
 		assertTrue(ans);

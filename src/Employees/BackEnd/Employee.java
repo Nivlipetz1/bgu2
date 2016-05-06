@@ -70,6 +70,10 @@ public class Employee {
         return dateOfHire.format(formatterDate);
     }
 
+    public LocalDate getDateOfHireAsLocalDate() {
+        return dateOfHire;
+    }
+
     public String getContract() {
         return contract;
     }
