@@ -14,10 +14,10 @@ public class Order {
 		int ans=-2;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT orderID FROM Segment ";
+			String sql="SELECT ID FROM Segment ";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				ans = rs.getInt("orderID");
+				ans = rs.getInt("ID");
 			}
 			rs.close();
 			st.close();
@@ -32,7 +32,7 @@ public class Order {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="INSERT INTO Segment(orderID,sourceID,destID)"+
+			String sql="INSERT INTO Segment(ID,SourceID,DestID)"+
 						" VALUES("+orderID+","+source+","+
 						dest+");";
 			if(st.executeUpdate(sql)==0) ans=false;
@@ -50,7 +50,7 @@ public class Order {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="DELETE from Segment where orderID="+orderID+";";
+			String sql="DELETE From Segment Where ID="+orderID+";";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 			
@@ -69,9 +69,9 @@ public class Order {
 			String sql="SELECT * FROM Segment";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				System.out.println("OrderID = "+rs.getInt("orderID"));
-				System.out.println("SourceID = "+rs.getInt("sourceID"));
-				System.out.println("DestinationID = "+rs.getInt("destID"));
+				System.out.println("OrderID = "+rs.getInt("ID"));
+				System.out.println("SourceID = "+rs.getInt("SourceID"));
+				System.out.println("DestinationID = "+rs.getInt("DestID"));
 				
 				System.out.println();
 			}

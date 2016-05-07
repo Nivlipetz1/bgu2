@@ -35,6 +35,9 @@ public interface IDAL {
     int roleID();
     Vector<Employee> getAvailableEmployees(int[][] avail);
     Shift getShift(LocalDate d, LocalTime startTime);
+    Vector<Driver> getDriversList();
+    boolean isDriver(int id);
+    boolean deleteDriver(int id);
 
 
 

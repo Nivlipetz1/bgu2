@@ -13,7 +13,7 @@ public class TransOrder {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="INSERT INTO TransOrder(transportID,orderID,itemID,numOfItems)"+
+			String sql="INSERT INTO TransOrder(TransportID,OrderID,ItemID,NumOfItems)"+
 						" VALUES("+transportID+","+orderID+","+itemID+","+numOfItems+");";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
@@ -30,7 +30,7 @@ public class TransOrder {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="DELETE from TransOrder where transportID="+transportID+" And orderID="+orderID+";";
+			String sql="DELETE from TransOrder where TransportID="+transportID+" And OrderID="+orderID+";";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 			

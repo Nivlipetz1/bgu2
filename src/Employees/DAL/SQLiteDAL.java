@@ -1,13 +1,16 @@
 package Employees.DAL;
+import Employees.BackEnd.*;
+import Employees.BackEnd.Driver;
+import org.sqlite.SQLiteDataSource;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-
-
-import Employees.BackEnd.*;
-import org.sqlite.SQLiteDataSource;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Set;
+import java.util.Vector;
 
 public class SQLiteDAL implements IDAL{
 
@@ -429,10 +432,22 @@ public class SQLiteDAL implements IDAL{
             int[][] availability = getAvailability(id);
             Employee emp = new Employee(firstName,lastName,
                     id,roles,dateOfHire,contract,bankAccount,availability);
-            return emp;
+            if(!isDriver(id))
+                return emp;
+            else{
+                stat = db.createStatement();
+                String sql = "SELECT * FROM Driver WHERE ID="+id;
+                set = stat.executeQuery(sql);
+                String licenseType = set.getString("LicenceType");
+                String licenseNum = String.valueOf(set.getInt("LicenceNum"));
+                set.close();
+                stat.close();
+                Driver driver = new Driver(emp,licenseType,licenseNum);
+                return driver;
+            }
         }
         catch (SQLException e){
-
+            System.out.println(e);
         }
         return null;
     }
@@ -455,6 +470,59 @@ public class SQLiteDAL implements IDAL{
         }
         return array;
     }
+
+    private boolean insertDriver(Driver driver){
+        try{
+            String sql = "INSERT INTO Driver VALUES (?,?,?)";
+            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat.setInt(1,driver.getId());
+            preStat.setInt(2,Integer.parseInt(driver.getLicenseNumber()));
+            preStat.setString(3,driver.getLicenseType());
+            int rows = preStat.executeUpdate();
+            preStat.close();
+            return rows==1;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    public boolean deleteDriver(int id){
+        try{
+            String sql = "Delete From Driver " +
+                    "Where ID="+id;
+            stat = db.createStatement();
+            int rows = stat.executeUpdate(sql);
+            stat.close();
+            return rows>0;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    private boolean updateDriver(Driver driver){
+        try{
+            String sql = "UPDATE Driver " +
+                    "Set LicenceNum=?, LicenceType=? " +
+                    "Where ID=?";
+            PreparedStatement stat = db.prepareStatement(sql);
+            stat.setInt(1,Integer.parseInt(driver.getLicenseNumber()));
+            stat.setString(2,driver.getLicenseType());
+            stat.setInt(3,driver.getId());
+            int rows = stat.executeUpdate(sql);
+            stat.close();
+            return rows==1;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return false;
+        }
+    }
+
+
 
     private Vector<Role> getEmployeeRoles(int id){
         Vector<Role> vec = new Vector<>();
@@ -514,6 +582,9 @@ public class SQLiteDAL implements IDAL{
                 addRole(r.getID(), emp.getId());
             }
             employeeAvailability(emp);
+            if(emp instanceof Driver){
+                insertDriver((Driver)emp);
+            }
         }
         catch(Exception e){
             System.out.print("insert employee");
@@ -556,6 +627,9 @@ public class SQLiteDAL implements IDAL{
             stat = db.createStatement();
             int rows = stat.executeUpdate(sql);
             stat.close();
+            if(emp instanceof Driver){
+                deleteDriver(emp.getId());
+            }
             return rows>0;
 
         }catch (Exception e){
@@ -592,6 +666,9 @@ public class SQLiteDAL implements IDAL{
                 if (!roleExists(emp.getId(),role,"rolesOfEmployees","EmployeeID")){
                     addRole(role.getID(),emp.getId());
                 }
+            }
+            if(emp instanceof Driver){
+                updateDriver((Driver)emp);
             }
             return (rowsAffected==1);
 
@@ -742,19 +819,66 @@ public class SQLiteDAL implements IDAL{
     }
 
     @Override
-    public Shift getShift(LocalDate d, LocalTime startTime) {
+    public Shift getShift(LocalDate d, LocalTime time) {
         try{
             stat = db.createStatement();
-            ResultSet set = stat.executeQuery("SELECT ID FROM Shifts " +
-                    "WHERE Date='"+d.format(formatterDate)+"' AND StartTime='"+startTime.format(formatterTime)+"'");
-            int id = set.getInt("ID");
+            ResultSet set = stat.executeQuery("SELECT * FROM Shifts " +
+                    "WHERE Date='"+d.format(formatterDate)+"' ");
+            int id = -1;
+            while(set.next()){
+                LocalTime start = LocalTime.parse(set.getString("StartTime"),formatterTime);
+                LocalTime end = LocalTime.parse(set.getString("EndTime"),formatterTime);
+                id = set.getInt("ID");
+                if(time.isAfter(start)&&time.isBefore(end))
+                    break;
+                            }
             set.close();
             stat.close();
             Shift shift = getShift(id);
             return shift;
         }
         catch (SQLException e){
+            System.out.println(e);
             return null;
         }
     }
+
+    @Override
+    public Vector<Driver> getDriversList() {
+        Vector<Employee> employees = getEmployees();
+        Vector<Driver> vec = new Vector<>();
+        String sql = "SELECT * FROM Driver " +
+                "WHERE ID=?";
+        try {
+                PreparedStatement prep = db.prepareStatement(sql);
+                for(Employee emp: employees) {
+                    prep.setInt(1,emp.getId());
+                    ResultSet set = prep.executeQuery();
+                    if(set.next()){
+                        Driver driver = new Driver(emp,set.getString("LicenceType"),String.valueOf(set.getInt("LicenceNum")));
+                        vec.add(driver);
+                    }
+                }
+            }
+        catch (SQLException e){
+            System.out.println(e);
+        }
+        return vec;
+    }
+
+    public boolean isDriver(int id){
+        try{
+            stat = db.createStatement();
+            String sql = "SELECT * FROM Driver WHERE ID="+id;
+            ResultSet set = stat.executeQuery(sql);
+            boolean ans = set.next();
+            set.close();
+            stat.close();
+            return ans;
+        }
+        catch (SQLException e){
+            return false;
+        }
+    }
+
 }

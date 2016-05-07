@@ -1,11 +1,14 @@
 package Employees.PL;
 
-import Employees.BL.*;
-import Employees.BackEnd.*;
+import Employees.BL.BL_IMPL;
+import Employees.BL.IBL;
+import Employees.BackEnd.Driver;
+import Employees.BackEnd.Employee;
+import Employees.BackEnd.Role;
 
-import java.util.*;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.*;
+import java.util.*;
 
 /**
  * Created by omer on 18/04/16.
@@ -36,6 +39,7 @@ public class EmployeeMenu {
         System.out.println(MainMenu.ANSI_BOLD+"2"+MainMenu.ANSI_RESET+". Edit/Delete Employee");
         System.out.println(MainMenu.ANSI_BOLD+"3"+MainMenu.ANSI_RESET+". Add Role");
         System.out.println(MainMenu.ANSI_BOLD+"4"+MainMenu.ANSI_RESET+". Edit/Delete Role");
+
 
         while(!switchCase) {
             int i = sc.nextInt();
@@ -68,8 +72,9 @@ public class EmployeeMenu {
     }
 
     private static void addEmployee(){
-        boolean switchCase=false, finishedRoles = false;
+        boolean switchCase=false, finishedRoles = false, driver = false;
         int[][] avail = new int[2][7];
+        String licenseNum="", licenseType="";
         Vector<Role> roles = new Vector<Role>();
         String fName, lName, bankAcct, contract;
         int ID, i=0, x=0, y=0, z=1, roleChosen; //use x,y for the availabilty array.. use z for rolesDictionary movement
@@ -124,6 +129,8 @@ public class EmployeeMenu {
             }
             else if(rolesDictionary.containsKey(roleChosen)){ //make sure input is valid
                 roles.add(rolesDictionary.get(roleChosen));
+                if (rolesDictionary.get(roleChosen).getName().equals("Driver")) //check if driver role chosen
+                    driver = true;
                 System.out.println(rolesDictionary.get(roleChosen).getName() + " added." );
             }
             else{
@@ -156,7 +163,15 @@ public class EmployeeMenu {
             }
         }
 
-        boolean result = bl_impl.insertEmployee(fName, lName, ID, roles, date, contract, bankAcct, avail);
+        if(driver){
+            System.out.println("Please enter license number:");
+            licenseNum = sc.next();
+
+            System.out.println("Please enter license type:");
+            licenseType = sc.next().toUpperCase();
+        }
+
+        boolean result = bl_impl.insertEmployee(fName, lName, ID, roles, date, contract, bankAcct, avail, licenseNum, licenseType);
         if(result){
             System.out.println("Employee added successfully!");
         }
@@ -167,7 +182,8 @@ public class EmployeeMenu {
 
     private static void editEmployee(){
         Vector<Employee> employees = bl_impl.getEmployees();
-        boolean switchCase=false, finishedRoles = false, result;
+        boolean switchCase=false, finishedRoles = false, result, driver = false;
+        String licenseNum="", licenseType="";
         int[][] avail = new int[2][7];
         Vector<Role> roles = new Vector<Role>();
         String fName, lName, bankAcct, contract;
@@ -245,8 +261,24 @@ public class EmployeeMenu {
                     if(bankAcct.equals("-1")){
                         bankAcct = emp.getBankAcct();
                     }
+                    for(Role r : emp.getRoles()){
+                        if(r.getName().equals("Driver"))
+                            driver = true;
+                    }
 
-                    bl_impl.updateEmployee(fName, lName, emp.getId(), emp.getRoles(), date, contract, bankAcct, emp.getAvailability());
+                    //update driver fields
+                    if(driver){
+                        System.out.println("Insert Employee's license number: (Current: "+((Driver)emp).getLicenseNumber()+" )");
+                        ((Driver)emp).setLicenseNumber(sc.next());
+
+                        System.out.println("Insert Employee's license type: (Current: "+((Driver)emp).getLicenseType()+" )");
+                        ((Driver)emp).setLicenseType(sc.next().toUpperCase());
+
+                        bl_impl.updateEmployee(fName, lName, emp.getId(), emp.getRoles(), date, contract, bankAcct, emp.getAvailability(), ((Driver)emp).getLicenseNumber(), ((Driver)emp).getLicenseType());
+                    }
+                    else{
+                        bl_impl.updateEmployee(fName, lName, emp.getId(), emp.getRoles(), date, contract, bankAcct, emp.getAvailability(), licenseNum, licenseType);
+                    }
                     switchCase = true;
                     break;
                 case 2:
@@ -278,7 +310,17 @@ public class EmployeeMenu {
                         }
                     }
 
-                    bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), avail);
+                    for(Role r : emp.getRoles()){
+                        if(r.getName().equals("Driver"))
+                            driver = true;
+                    }
+                    if(driver){
+                        bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), avail, ((Driver)emp).getLicenseNumber(), ((Driver)emp).getLicenseType());
+                    }
+                    else{
+                        bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), avail, licenseNum, licenseType);
+                    }
+
                     switchCase = true;
                     break;
                 case 3:
@@ -297,6 +339,12 @@ public class EmployeeMenu {
                         else if(rolesDictionary.containsKey(roleChosen)){ //make sure choice is valid
                             //remove from the employee's roles vector
                             System.out.println(emp.getRoles().get(roleChosen-1).getName() + " removed." );
+
+                            //delete driver
+                            if(emp.getRoles().get(roleChosen-1).getName().equals("Driver")){
+                                bl_impl.deleteDriver(emp.getId());
+                            }
+
                             emp.getRoles().remove(roleChosen-1);
                         }
                         else{
@@ -304,7 +352,17 @@ public class EmployeeMenu {
                         }
                     }
 
-                    bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability());
+                    for(Role r : emp.getRoles()){
+                        if(r.getName().equals("Driver"))
+                            driver = true;
+                    }
+                    if(driver){
+                        bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability(), ((Driver)emp).getLicenseNumber(), ((Driver)emp).getLicenseType());
+                    }
+                    else{
+                        bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability(), licenseNum, licenseType);
+                    }
+
                     switchCase = true;
                     break;
                 case 4:
@@ -335,7 +393,17 @@ public class EmployeeMenu {
                         }
                     }
 
-                    result = bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability());
+                    for(Role r : emp.getRoles()){
+                        if(r.getName().equals("Driver"))
+                            driver = true;
+                    }
+                    if(driver){
+                        result = bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability(), ((Driver)emp).getLicenseNumber(), ((Driver)emp).getLicenseType());
+                    }
+                    else{
+                        result = bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability(), licenseNum, licenseType);
+                    }
+
                     if(result){
                         System.out.println("Employee successfully edited");
                     }

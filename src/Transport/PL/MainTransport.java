@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 public class MainTransport {
 	private static Scanner in = new Scanner(System.in);
-	private static DriverMenu driverMenu;
 	private static ItemMenu itemMenu;
 	private static TransportMenu transportMenu;
 	private static TruckMenu truckMenu;
@@ -12,7 +11,6 @@ public class MainTransport {
 	
 	
 	public MainTransport(){
-		driverMenu = new DriverMenu(this);
 		itemMenu = new ItemMenu(this);
 		transportMenu = new TransportMenu(this);
 		truckMenu = new TruckMenu(this);
@@ -35,10 +33,9 @@ public class MainTransport {
 		System.out.println();
 		System.out.println("1- Transport Options");
 		System.out.println("2- Truck Options");
-		System.out.println("3- Driver Options");
-		System.out.println("4- Items Options");
-		System.out.println("5- Places Options");
-		System.out.println("6- Exit");
+		System.out.println("3- Items Options");
+		System.out.println("4- Places Options");
+		System.out.println("5- Exit");
 		System.out.println();
 		
 		choice = in.nextInt();
@@ -51,14 +48,11 @@ public class MainTransport {
 			truckMenu.display();
 			break;
 		case 3:
-			driverMenu.display();
-			break;
-		case 4: 
 			itemMenu.display();
 			break;
-		case 5:
+		case 4:
 			placeMenu.display();
-		case 6:
+		case 5:
 			exit();
 		default:
 			System.out.println("Invalid input");

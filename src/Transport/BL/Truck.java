@@ -1,21 +1,28 @@
 package Transport.BL;
+import Employees.BL.BL_IMPL;
+import Program.DriverInformations;
+
 import java.sql.*;
+import java.util.*;
 
 
 public class Truck {
 	private Connection db;
+	private static DriverInformations driverInformations = new BL_IMPL();
+
 
 	public Truck(Connection db){
 		this.db=db;
 	}
-	
-	public boolean add(int truckPlateNum,String licenceType,String model,String color,double weightNeto,double maxWeight, double actualWeight){
+
+	//available 0=Available, 1=Busy
+	public boolean add(int truckPlateNum,String licenceType,String model,String color,double weightNeto,double maxWeight, double actualWeight, int available){
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="INSERT INTO Truck(truckPlateNum,licenceType,model,color,weightNeto,maxWeight,actualWeight)"+
+			String sql="INSERT INTO Truck(TruckPlateNum,LicenceType,Model,Color,WeightNeto,MaxWeight,ActualWeight,Available)"+
 					" VALUES("+truckPlateNum+",'"+licenceType+"','"+
-					model+"','"+color+"',"+weightNeto+","+maxWeight+","+weightNeto+");";
+					model+"','"+color+"',"+weightNeto+","+maxWeight+","+weightNeto+", 0);";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 		} catch (SQLException e) {
@@ -31,7 +38,7 @@ public class Truck {
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="DELETE from Truck where truckPlateNum="+truckPlateNum+";";
+			String sql="DELETE from Truck where TruckPlateNum="+truckPlateNum+";";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 
@@ -45,7 +52,7 @@ public class Truck {
 		boolean ans = true;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT truckPlateNum FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql="SELECT TruckPlateNum FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
 			ResultSet rs = st.executeQuery(sql);
 			if(!rs.next()) ans=false;
 			st.close();
@@ -61,15 +68,15 @@ public class Truck {
 		String licenceDriver;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT licenceType FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql="SELECT LicenceType FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
 			ResultSet rs = st.executeQuery(sql);
 			
 			Statement st2=db.createStatement();
-			String sql2="SELECT licenceType FROM Driver WHERE driverID = "+driverID+";";
+			String sql2="SELECT LicenceType FROM Driver WHERE driverID = "+driverID+";";
 			ResultSet rs2 = st2.executeQuery(sql2);
-			licenceDriver = rs2.getString("licenceType");
+			licenceDriver = rs2.getString("LicenceType");
 			while (rs.next() && !ans){
-				ans = (licenceDriver.equals(rs.getString("licenceType")));
+				ans = (licenceDriver.equals(rs.getString("LicenceType")));
 			}
 			rs.close();
 			st.close();
@@ -90,11 +97,11 @@ public class Truck {
 			String sql="SELECT * FROM Truck";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
-				System.out.println("Plate Number = "+rs.getInt("truckPlateNum"));
-				System.out.println("Licence Type = "+rs.getString("licenceType"));
-				System.out.println("Model = "+rs.getString("model"));
-				System.out.println("Color = "+rs.getString("color"));
-				System.out.println("Net Weight = "+rs.getInt("weightNeto"));
+				System.out.println("Plate Number = "+rs.getInt("TruckPlateNum"));
+				System.out.println("Licence Type = "+rs.getString("LicenceType"));
+				System.out.println("Model = "+rs.getString("Model"));
+				System.out.println("Color = "+rs.getString("Color"));
+				System.out.println("Net Weight = "+rs.getInt("WeightNeto"));
 				System.out.println("Actual Weight = "+rs.getInt("actualWeight"));
 				System.out.println("Max Weight = "+rs.getInt("maxWeight"));
 				System.out.println();
@@ -115,13 +122,13 @@ public class Truck {
 		int allWeight = 0;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT actualWeight,maxWeight FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql="SELECT ActualWeight,MaxWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
 			ResultSet rs = st.executeQuery(sql);
 			
 			itemWeight = Run.item.getItemWeight(itemID);
 			allWeight = itemWeight * amount;
-			actualTruckWeight = rs.getInt("actualWeight");
-			maxTruckWeight = rs.getInt("maxWeight");
+			actualTruckWeight = rs.getInt("ActualWeight");
+			maxTruckWeight = rs.getInt("MaxWeight");
 
 			ans = (maxTruckWeight >= (actualTruckWeight + allWeight) );
 			rs.close();
@@ -139,11 +146,11 @@ public class Truck {
 		int weightAllowed;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT actualWeight,maxWeight FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql="SELECT ActualWeight,MaxWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
 			ResultSet rs = st.executeQuery(sql);
 			
-			actualTruckWeight = rs.getInt("actualWeight");
-			maxTruckWeight = rs.getInt("maxWeight");
+			actualTruckWeight = rs.getInt("ActualWeight");
+			maxTruckWeight = rs.getInt("MaxWeight");
 			weightAllowed = maxTruckWeight - actualTruckWeight;
 			
 			System.out.println("The truck "+truckPlateNum+" have "+weightAllowed+"kg free");
@@ -162,12 +169,12 @@ public class Truck {
 		int newWeight=0;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT actualWeight FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql="SELECT ActualWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
 			ResultSet rs = st.executeQuery(sql);
 			
 			itemWeight = Run.item.getItemWeight(itemID);
 			allWeight = itemWeight * amount;
-			actualTruckWeight = rs.getInt("actualWeight");
+			actualTruckWeight = rs.getInt("ActualWeight");
 			newWeight = actualTruckWeight + allWeight;
 			
 			//System.out.println("Actual Weight = "+actualTruckWeight);
@@ -176,7 +183,7 @@ public class Truck {
 
 
 			Statement st2=db.createStatement();
-			String sql2="UPDATE Truck SET actualWeight = "+newWeight +" WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql2="UPDATE Truck SET ActualWeight = "+newWeight +" WHERE TruckPlateNum = "+truckPlateNum+";";
 			PreparedStatement pstmt = db.prepareStatement(sql2);
 			pstmt.executeUpdate();
 
@@ -192,6 +199,99 @@ public class Truck {
 		}
 		return ans;
 	}
+
+	public String getLicenceType (int truckPlateNum){
+		String ans="";
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT LicenceType FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			ResultSet rs = st.executeQuery(sql);
+
+			ans = rs.getString("licenceType");
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		return ans;
+	}
+
+	public Vector <String> getLicencesTypes (){
+		Vector<String> ans= new Vector<String>();
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT LicenceType FROM Truck;";
+			ResultSet rs = st.executeQuery(sql);
+			while (rs.next()){
+				ans.add(rs.getString("licenceType"));
+			}
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		return ans;
+	}
+
+	public boolean isTruckAvailable (int truckPlateNum){
+		boolean ans = false;
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT Available FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
+			ResultSet rs = st.executeQuery(sql);
+
+			int isAvailable = rs.getInt("Available");
+
+			ans = (isAvailable == 0);
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+			ans = false;
+		}
+		return ans;
+	}
+
+	public  void setAvailability (int truckPlateNum, int available){
+		try {
+			Statement st2=db.createStatement();
+			String sql2="UPDATE Truck SET Available = "+available +" WHERE TruckPlateNum = "+truckPlateNum+";";
+			PreparedStatement pstmt = db.prepareStatement(sql2);
+			pstmt.executeUpdate();
+			st2.close();
+
+		} catch (SQLException e) {
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+	}
+
+
+	public boolean isTransportPossible(){
+		return (vectorLicenceTypeAvailablesToTransport()!=null);
+	}
+
+	public Vector<String> vectorLicenceTypeAvailablesToTransport(){
+		Vector<String> ans = new Vector<String>();
+		Vector<String> driverLicenceTypesAvailables = driverInformations.getDriversTypesLicencesAvailables();
+
+		Enumeration en = driverLicenceTypesAvailables.elements();
+		while(en.hasMoreElements()){
+			boolean areEqual = false;
+			Vector<String> truckLicenceTypesAvailables = getLicencesTypes();
+			Enumeration en2 = truckLicenceTypesAvailables.elements();
+			while (!areEqual && en2.hasMoreElements()){
+				if (en.nextElement().equals(en2.nextElement())){
+					areEqual = true;
+					if (!ans.contains(en.nextElement())){
+						ans.addElement((String) en.nextElement());
+					}
+				}
+			}
+		}
+		return ans;
+	}
+
+
 	
 	public boolean removeWeight (int truckPlateNum, int itemID, int amount){
 		boolean ans = false;
@@ -201,16 +301,16 @@ public class Truck {
 		int newWeight=0;
 		try {
 			Statement st=db.createStatement();
-			String sql="SELECT actualWeight FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql="SELECT ActualWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
 			ResultSet rs = st.executeQuery(sql);
 			
 			itemWeight = Run.item.getItemWeight(itemID);
 			allWeight = itemWeight * amount;
-			actualTruckWeight = rs.getInt("actualWeight");
+			actualTruckWeight = rs.getInt("ActualWeight");
 			newWeight = actualTruckWeight - allWeight;
 
 			Statement st2=db.createStatement();
-			String sql2="UPDATE Truck SET actualWeight ="+newWeight+" WHERE truckPlateNum = "+truckPlateNum+";";
+			String sql2="UPDATE Truck SET ActualWeight ="+newWeight+" WHERE TruckPlateNum = "+truckPlateNum+";";
 			ResultSet rs2 = st.executeQuery(sql2);
 			
 			rs.close();
