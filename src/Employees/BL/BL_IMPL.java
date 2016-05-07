@@ -195,6 +195,11 @@ public class BL_IMPL implements IBL, DriverInformations {
         String lType;
         boolean employeeInShift = false, employeeIsDriver = false, driverAvailable=false;
 
+        if(curShift==null){
+            System.out.println("No shift exists for the day and time inserted..");
+            return false;
+        }
+
         //get list of drivers available for this shift
         for(Employee e : getAvailableEmployees(getShiftDay(date, time))) {
             if(!driverAvailable) {
@@ -235,6 +240,11 @@ public class BL_IMPL implements IBL, DriverInformations {
         boolean employeeInShift = false, employeeIsDriver = false;
         Vector<Employee> driversList = new Vector<Employee>();
 
+        if(curShift==null){
+            System.out.println("No shift exists for the day and time inserted..");
+            return null;
+        }
+
         //get list of drivers available for this shift
         for(Employee e : getAvailableEmployees(getShiftDay(date, time))) {
             //check if employee is driver
@@ -269,24 +279,29 @@ public class BL_IMPL implements IBL, DriverInformations {
      */
     public void setDriverBusy(int employeeID, LocalTime time, LocalDate date) {
         Shift curShift = SQLDAL.getShift(date, time);
-        //add new pair <Driver, Employee> into the roles of the shift
-        //id of driver role is 99
-        curShift.getRoles().add(new Pair(getRole(3), getEmployee(employeeID)));
-        if(curShift.getAmountOfRoles().containsKey(3)){
-            //increase amount of Drivers by 1
-            curShift.getAmountOfRoles().replace(3, curShift.getAmountOfRoles().get(3)+1);
-        }
-        else{
-            //add 1 driver to amount of roles
-            curShift.getAmountOfRoles().put(3, 1);
-        }
 
-        boolean result = SQLDAL.update(curShift);
-        if(result){
-            System.out.println("Driver added successfuly!");
+        if(curShift==null){
+            System.out.println("No shift exists for the day and time inserted..");
+            System.out.println("Failed to add driver to shift.");
         }
-        else{
-            System.out.println("Failed to add driver...");
+        else {
+            //add new pair <Driver, Employee> into the roles of the shift
+            //id of driver role is 99
+            curShift.getRoles().add(new Pair(getRole(3), getEmployee(employeeID)));
+            if (curShift.getAmountOfRoles().containsKey(3)) {
+                //increase amount of Drivers by 1
+                curShift.getAmountOfRoles().replace(3, curShift.getAmountOfRoles().get(3) + 1);
+            } else {
+                //add 1 driver to amount of roles
+                curShift.getAmountOfRoles().put(3, 1);
+            }
+
+            boolean result = SQLDAL.update(curShift);
+            if (result) {
+                System.out.println("Driver added successfuly!");
+            } else {
+                System.out.println("Failed to add driver...");
+            }
         }
     }
 
@@ -294,6 +309,11 @@ public class BL_IMPL implements IBL, DriverInformations {
     public boolean isStoreKeeperAvailable(LocalTime time, LocalDate date) {
         Shift curShift = SQLDAL.getShift(date, time);
         boolean storeKeeperAvailable=false;
+
+        if(curShift==null){
+            System.out.println("No shift exists for the day and time inserted..");
+            return false;
+        }
 
         for(Pair p: curShift.getRoles()){
             if(p.getRole().getName().equals("StoreKeeper"))
@@ -309,6 +329,11 @@ public class BL_IMPL implements IBL, DriverInformations {
         Vector<String> driversList = new Vector<String>();
         String lType;
         boolean employeeInShift = false, employeeIsDriver = false;
+
+        if(curShift==null){
+            System.out.println("No shift exists for the day and time inserted..");
+            return null;
+        }
 
         //get list of drivers available for this shift
         for(Employee e : getAvailableEmployees(getShiftDay(LocalDate.now(), LocalTime.now()))) {
