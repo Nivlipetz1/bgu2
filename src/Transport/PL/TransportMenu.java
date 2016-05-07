@@ -4,6 +4,7 @@ import Employees.BL.BL_IMPL;
 import Employees.BL.IBL;
 import Employees.BackEnd.Driver;
 import Employees.BackEnd.Employee;
+import Employees.PL.MainMenu;
 import Program.DriverInformations;
 import Transport.BL.Run;
 
@@ -21,7 +22,7 @@ public class TransportMenu {
 	private static int driverID, truckPlateNum;
 	private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
 	private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
-	private static DriverInformations driverInformations;
+	private static DriverInformations driverInformations = new BL_IMPL();
 
 
 	public TransportMenu(MainTransport mainTransport){
@@ -62,11 +63,27 @@ public class TransportMenu {
 		LocalDate date;
 		LocalTime startTime;
 
-		System.out.println("Step 1/7 - Please enter the Date of the Incoming Transport: (dd/MM/yyyy)");
-		date = LocalDate.parse(in.next(), dateFormatter);
+		System.out.println("Step 1/2 - Please enter the Date of the Incoming Transport: (dd/MM/yyyy)");
+		while(true) {
+			try {
+				date = LocalDate.parse(in.next(), dateFormatter);
+				break;
+			} catch (Exception e) {
+				System.out.println("Bad Input! Please try again: ");
+				System.out.println();
+			}
+		}
 
-		System.out.println("Step 2/7 - Please enter the Hour of the Incoming Transport: (HH:mm)");
-		startTime = LocalTime.parse(in.next(), timeFormatter);
+		System.out.println("Step 2/2 - Please enter the Hour of the Incoming Transport: (HH:mm)");
+		while(true) {
+			try {
+				startTime = LocalTime.parse(in.next(), timeFormatter);
+				break;
+			} catch (Exception e) {
+				System.out.println("Bad Input! Please try again: ");
+				System.out.println();
+			}
+		}
 
 		System.out.println("Just a moment, we are checking with the Department Employee if a Store Keeper is Available to get the Transport");
 		boolean canGetTransport = driverInformations.isStoreKeeperAvailable(startTime, date);
@@ -95,7 +112,7 @@ public class TransportMenu {
 	}
 
 	private void checkConditions() {
-		if (Run.truck.vectorLicenceTypeAvailablesToTransport() != null) {
+		if (Run.truck.isTransportPossible()) {
 			if (Run.truck.vectorLicenceTypeAvailablesToTransport().size()>0){
 				int confirm = -1;
 
@@ -121,7 +138,7 @@ public class TransportMenu {
 					addTransport(day);
 				}
 			} else {
-				System.out.println("Sorry, you don't have any Driver Available which can Drive One of our Available Truck");
+				System.out.println("Sorry, We don't have any Driver Available which can Drive One of our Available Truck");
 				mainTransport.optionDone();
 			}
 		}
@@ -137,10 +154,26 @@ public class TransportMenu {
 		boolean ans = true, order=true, transOrder=true;
 
 		System.out.println("Step 1/7 - Please enter the Date: (dd/mm/yy)");
-		date = LocalDate.parse(in.next(), dateFormatter);
+		while(true) {
+			try {
+				date = LocalDate.parse(in.next(), dateFormatter);
+				break;
+			} catch (Exception e) {
+				System.out.println("Bad Input! Please try again: ");
+				System.out.println();
+			}
+		}
 
 		System.out.println("Step 2/7 - Please enter the leaving time: (hh:mm)");
-		startTime = LocalTime.parse(in.next(), timeFormatter);
+		while(true) {
+			try {
+				startTime = LocalTime.parse(in.next(), timeFormatter);
+				break;
+			} catch (Exception e) {
+				System.out.println("Bad Input! Please try again: ");
+				System.out.println();
+			}
+		}
 
 		System.out.println("Step 3/7 - Please enter a Truck Plate Number: ");
 		truckPlateNum = truckExist();
