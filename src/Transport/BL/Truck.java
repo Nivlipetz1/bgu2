@@ -1,4 +1,5 @@
 package Transport.BL;
+import Employees.BL.BL_IMPL;
 import Program.DriverInformations;
 
 import java.sql.*;
@@ -7,7 +8,7 @@ import java.util.*;
 
 public class Truck {
 	private Connection db;
-	private static DriverInformations driverInformations;
+	private static DriverInformations driverInformations = new BL_IMPL();
 
 
 	public Truck(Connection db){
@@ -262,6 +263,11 @@ public class Truck {
 		} catch (SQLException e) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		}
+	}
+
+
+	public boolean isTransportPossible(){
+		return (vectorLicenceTypeAvailablesToTransport()!=null);
 	}
 
 	public Vector<String> vectorLicenceTypeAvailablesToTransport(){
