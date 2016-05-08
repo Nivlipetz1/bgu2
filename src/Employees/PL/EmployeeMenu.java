@@ -357,10 +357,10 @@ public class EmployeeMenu {
                             driver = true;
                     }
                     if(driver){
-                        bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability(), ((Driver)emp).getLicenseNumber(), ((Driver)emp).getLicenseType());
+                        bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability(), ((Driver)emp).getLicenseType(), ((Driver)emp).getLicenseNumber());
                     }
                     else{
-                        bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability(), licenseNum, licenseType);
+                        bl_impl.updateEmployee(emp.getFirstName(), emp.getLastName(), emp.getId(), emp.getRoles(), LocalDate.parse(emp.getDateOfHire(), formatter), emp.getContract(), emp.getBankAcct(), emp.getAvailability(), licenseType, licenseNum);
                     }
 
                     switchCase = true;
