@@ -105,7 +105,7 @@ public class TransportMenu {
 				}
 			}
 			else{
-				System.out.println("Thank you!");
+				System.out.println("Thank you!!");
 			}
 		}
 		else {
