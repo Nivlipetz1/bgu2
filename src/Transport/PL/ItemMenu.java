@@ -1,5 +1,7 @@
 package Transport.PL;
 
+import Transport.BL.Run;
+
 import java.util.Scanner;
 
 public class ItemMenu {
@@ -47,8 +49,7 @@ public class ItemMenu {
 		int weight;
 		String itemName;
 
-		System.out.println("Please enter an Item ID: ");
-		itemID = in.nextInt();
+		itemID = Run.item.getLastItemId();
 		System.out.println("Please enter an Item Name: ");
 		itemName = in.nextLine();
 		itemName = in.nextLine();

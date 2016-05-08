@@ -104,6 +104,9 @@ public class TransportMenu {
 					System.out.println("Sorry, the Licence Num is not a part of our DataBase");
 				}
 			}
+			else{
+				System.out.println("Thank you!");
+			}
 		}
 		else {
 			System.out.println("Sorry, none of our Store Keeper is Available to get the Transport!");
@@ -112,8 +115,6 @@ public class TransportMenu {
 	}
 
 	private void checkConditions() {
-		if (Run.truck.isTransportPossible()) {
-			if (Run.truck.vectorLicenceTypeAvailablesToTransport().size()>0){
 				int confirm = -1;
 
 				while (day < 1 || day > 7) {
@@ -137,12 +138,9 @@ public class TransportMenu {
 				} else {
 					addTransport(day);
 				}
-			} else {
-				System.out.println("Sorry, We don't have any Driver Available which can Drive One of our Available Truck");
-				mainTransport.optionDone();
-			}
+
 		}
-	}
+
 	
 	private void addTransport(int day){
 		Vector <Integer> vectorDest = new Vector<Integer>();
@@ -250,7 +248,6 @@ public class TransportMenu {
 			Vector<Employee> vectorEmployee = driverInformations.getDriverList(licenceType, time, date);
 			int driversAvailablesLength = vectorEmployee.size();
 			System.out.println("Nice, "+driversAvailablesLength+" Drivers Can Drive Your Selected Truck!");
-			System.out.println();
 			if (driversAvailablesLength > 1) {
 				System.out.println("Do you want to Choose a Driver, or Do You Prefer That We Will Choose One For You?");
 				System.out.println("1- I Want to Choose, 2-Choose Automatically");
@@ -266,6 +263,7 @@ public class TransportMenu {
 					}
 					driverID = in.nextInt();
 					if (bl_impl.idExists(driverID)){
+						driverInformations.setDriverBusy(driverID,time,date);
 						System.out.println("The Driver "+bl_impl.getEmployee(driverID).getFirstName()+" "+bl_impl.getEmployee(driverID).getLastName()+" was Successfully Choosen");
 					}
 					else{
@@ -276,6 +274,7 @@ public class TransportMenu {
 				if (driverID== -1){
 					Employee employeeToDrive = vectorEmployee.get(0);
 					driverID = employeeToDrive.getId();
+					driverInformations.setDriverBusy(driverID,time,date);
 					System.out.println();
 					System.out.println("The Driver "+employeeToDrive.getFirstName()+" "+employeeToDrive.getLastName()+" was Successfully Choosen");
 				}
@@ -283,6 +282,7 @@ public class TransportMenu {
 			else if (driversAvailablesLength == 1){
 				Employee employeeToDrive = vectorEmployee.get(0);
 				driverID = employeeToDrive.getId();
+				driverInformations.setDriverBusy(driverID,time,date);
 				System.out.println();
 				System.out.println("The Driver "+employeeToDrive.getFirstName()+" "+employeeToDrive.getLastName()+" was Successfully Choosen");
 			}

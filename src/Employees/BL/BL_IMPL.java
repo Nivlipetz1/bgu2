@@ -205,7 +205,7 @@ public class BL_IMPL implements IBL, DriverInformations {
             if(!driverAvailable) {
                 //check if employee is driver
                 for (Role r : e.getRoles()) {
-                    if (r.getName() == "Driver")
+                    if (r.getName().equals("Driver"))
                         employeeIsDriver = true;
                 }
 
@@ -221,7 +221,7 @@ public class BL_IMPL implements IBL, DriverInformations {
                     if (!employeeInShift) {
                         lType = ((Driver) e).getLicenseType();
                         //add type to list
-                        if (lType == licenceType)
+                        if (lType.equals(licenceType))
                             driverAvailable = true;
                     }
                     employeeInShift = false;
@@ -262,7 +262,7 @@ public class BL_IMPL implements IBL, DriverInformations {
                 if (!employeeInShift) {
                     lType = ((Driver) e).getLicenseType();
                     //add type to list
-                    if (lType == licenceType)
+                    if (lType.equals(licenceType))
                         driversList.add(e);
                 }
                 employeeInShift = false;

@@ -8,7 +8,25 @@ public class Item {
 	public Item (Connection db){
 		this.db=db;
 	}
-	
+
+
+	public int getLastItemId(){
+		int ans=-2;
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT ID FROM Item ";
+			ResultSet rs = st.executeQuery(sql);
+			while (rs.next()){
+				ans = rs.getInt("ID");
+			}
+			rs.close();
+			st.close();
+		} catch (SQLException e) {
+			ans = 555;
+		}
+		return ans+1;
+	}
+
 	public boolean add(int itemID,String itemName, int weight){
 		boolean ans=true;
 		try {
