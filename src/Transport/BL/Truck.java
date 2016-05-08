@@ -275,6 +275,8 @@ public class Truck {
 		Vector<String> driverLicenceTypesAvailables = driverInformations.getDriversTypesLicencesAvailables();
 
 		Enumeration en = driverLicenceTypesAvailables.elements();
+
+		//TODO NEED TO CHECK THAT ENUMERATION IS NOT NULL (there might not be a shift in the time now ->which will return null)
 		while(en.hasMoreElements()){
 			boolean areEqual = false;
 			Vector<String> truckLicenceTypesAvailables = getLicencesTypes();
