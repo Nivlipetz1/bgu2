@@ -18,8 +18,6 @@ public class MainTransport {
 	}
 	
 	public void display(){
-		System.out.println("Welcome to Super-Lee!");
-		System.out.println("*****************");
 		System.out.println();
 
 		displayMenu();
@@ -35,7 +33,8 @@ public class MainTransport {
 		System.out.println("2- Truck Options");
 		System.out.println("3- Items Options");
 		System.out.println("4- Places Options");
-		System.out.println("5- Exit");
+		System.out.println("5- Return to Super-LEE options");
+		System.out.println("6- Exit");
 		System.out.println();
 		
 		choice = in.nextInt();
@@ -53,7 +52,10 @@ public class MainTransport {
 		case 4:
 			placeMenu.display();
 		case 5:
+			break;
+		case 6:
 			exit();
+
 		default:
 			System.out.println("Invalid input");
 			System.out.println();

@@ -97,13 +97,15 @@ public class Truck {
 			String sql="SELECT * FROM Truck";
 			ResultSet rs = st.executeQuery(sql);
 			while (rs.next()){
+				boolean isAvailable = (rs.getInt("Available")==0);
 				System.out.println("Plate Number = "+rs.getInt("TruckPlateNum"));
 				System.out.println("Licence Type = "+rs.getString("LicenceType"));
 				System.out.println("Model = "+rs.getString("Model"));
 				System.out.println("Color = "+rs.getString("Color"));
 				System.out.println("Net Weight = "+rs.getInt("WeightNeto"));
-				System.out.println("Actual Weight = "+rs.getInt("actualWeight"));
-				System.out.println("Max Weight = "+rs.getInt("maxWeight"));
+				System.out.println("Actual Weight = "+rs.getInt("ActualWeight"));
+				System.out.println("Max Weight = "+rs.getInt("MaxWeight"));
+				System.out.println("Availablity = "+isAvailable);
 				System.out.println();
 			}
 			rs.close();
@@ -290,6 +292,7 @@ public class Truck {
 				}
 			}
 		}
+
 		return ans;
 	}
 
