@@ -254,7 +254,7 @@ public class ShiftMenu {
                 for(int e=0;e<availableEmployeesBasedOnRole.size();e++){
                     availableEmployeesBasedOnRole.remove(0);
                 }
-                /*
+                /* //TODO in presentation
                 for(int e=0;e<availableEmployees.size();e++){
                     availableEmployees.remove(0);
                 }*/
@@ -473,6 +473,7 @@ public class ShiftMenu {
                         /*list all managers in store that are available on this day and this shift*/
                         boolean flag = false;
                         for (Employee emp : availableEmployees) {
+                            flag = false;   //TODO in presentation
                             for (Pair p : shiftRoles) {
                                 if (p.getEmployee().getId() == emp.getId() || emp.getId() == shift.getManager().getId()) {
                                     flag = true;
@@ -489,28 +490,32 @@ public class ShiftMenu {
                             }
                         }
 
-                        for (Employee emp : availableEmployeesBasedOnRole) {
-                            for(Pair p : shiftRoles){
-                                if (emp.getId() == p.getEmployee().getId() || emp.getId() == shift.getManager().getId())
-                                    found = true;
+                        if(availableEmployeesBasedOnRole.size()==0){
+                            System.out.println("No employees available for role");
+                            break;
+                        }
+                        else {
+                            for (Employee emp : availableEmployeesBasedOnRole) {
+                                for (Pair p : shiftRoles) {
+                                    if (emp.getId() == p.getEmployee().getId() || emp.getId() == shift.getManager().getId())
+                                        found = true;
+                                }
+                                if (!found) {
+                                    System.out.println(emp.getId() + ": " + emp.getFirstName() + " " + emp.getLastName());
+                                }
                             }
-                            if(!found){
-                                System.out.println(emp.getId() + ": "+ emp.getFirstName() + " " + emp.getLastName());
+
+                            empID = sc.nextInt();
+
+                            if (empID != 0) {
+                                //insert into pair
+                                shiftRoles.add(new Pair(bl_impl.getRole(emptyRoles.get(choice)), bl_impl.getEmployee(empID)));
+                            }
+
+                            for (int e = 0; e < availableEmployeesBasedOnRole.size(); e++) {
+                                availableEmployeesBasedOnRole.remove(0);
                             }
                         }
-
-                        empID = sc.nextInt();
-
-                        if (empID != 0) {
-                            //insert into pair
-                            shiftRoles.add(new Pair(bl_impl.getRole(emptyRoles.get(choice)), bl_impl.getEmployee(empID)));
-                        }
-
-                        for(int e=0; e<availableEmployeesBasedOnRole.size();e++){
-                            availableEmployeesBasedOnRole.remove(0);
-                        }
-
-
                         switchCase=true;
                         break;
 
