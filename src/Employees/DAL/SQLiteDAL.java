@@ -26,10 +26,9 @@ public class SQLiteDAL implements IDAL{
         connected();
         try {
             db = dataSource.getConnection();
-
         }
         catch (Exception e){
-            System.out.println(e);
+
         }
 
                 /*initialize days strings*/
@@ -57,7 +56,7 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -76,7 +75,7 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -93,7 +92,7 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -110,7 +109,7 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -141,7 +140,7 @@ public class SQLiteDAL implements IDAL{
             return new Day(morningShift,eveningShift,d);
         }
         catch(SQLException e){
-            //System.out.println(e);
+            //
             return null;
         }
 
@@ -447,7 +446,7 @@ public class SQLiteDAL implements IDAL{
             }
         }
         catch (SQLException e){
-            System.out.println(e);
+
         }
         return null;
     }
@@ -483,7 +482,7 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -498,7 +497,7 @@ public class SQLiteDAL implements IDAL{
             return rows>0;
         }
         catch(Exception e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -517,7 +516,7 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -613,7 +612,7 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch (SQLException e){
-            System.out.println(e);
+
             return false;
         }
     }
@@ -673,7 +672,7 @@ public class SQLiteDAL implements IDAL{
             return (rowsAffected==1);
 
         } catch(SQLException e){
-            System.out.println(e);
+
             return false;
         }
 
@@ -716,7 +715,7 @@ public class SQLiteDAL implements IDAL{
             stat.close();
             return count+1;
         }catch (SQLException e){
-            System.out.println(e);
+
             return -1;
         }
     }
@@ -743,7 +742,7 @@ public class SQLiteDAL implements IDAL{
 
         }
         catch (SQLException e){
-            System.out.println(e);
+
         }
         return list;
     }
@@ -787,7 +786,7 @@ public class SQLiteDAL implements IDAL{
             return set;
         }
         catch (SQLException e){
-            System.out.println(e);
+
             return null;
         }
     }
@@ -838,7 +837,7 @@ public class SQLiteDAL implements IDAL{
             return shift;
         }
         catch (SQLException e){
-            System.out.println(e);
+
             return null;
         }
     }
@@ -861,7 +860,7 @@ public class SQLiteDAL implements IDAL{
                 }
             }
         catch (SQLException e){
-            System.out.println(e);
+
         }
         return vec;
     }

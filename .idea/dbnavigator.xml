@@ -16,7 +16,7 @@
       <scope value="GLOBAL" />
       <destination value="FILE" />
       <format value="EXCEL" />
-      <charset value="UTF-8" />
+      <charset value="windows-1252" />
     </export-instructions>
   </component>
   <component name="DBNavigator.Project.DatabaseBrowserManager">
@@ -33,7 +33,17 @@
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Employees" active-filter-id="EMPTY_FILTER" />
     <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.EmployeeAvailability" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.TransOrder" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Transport" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Item" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Days" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Shifts" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.EmployeesInShifts" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.RolesOfShifts" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Truck" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Roles" active-filter-id="EMPTY_FILTER" />
     <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Driver" active-filter-id="EMPTY_FILTER" />
+    <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.Segment" active-filter-id="EMPTY_FILTER" />
     <filter-list connection-id="b1d57bb8-60b6-4a12-95c9-b070df4fa99e" dataset="main.RolesOfEmployees" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.EditorStateManager">
@@ -103,7 +113,7 @@
           <password-expiry-time value="10" />
           <max-connection-pool-size value="7" />
           <alternative-statement-delimiter value="" />
-          <connect-automatically value="true" />
+          <connect-automatically value="false" />
         </details>
         <object-filters hide-empty-schemas="false">
           <object-type-filter use-master-settings="true">
