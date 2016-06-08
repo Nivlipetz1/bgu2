@@ -721,7 +721,7 @@ public class SQLiteDAL implements IDAL{
     }
 
     private boolean connected() {
-        dataSource.setUrl("jdbc:sqlite:superlee");
+        dataSource.setUrl("jdbc:sqlite:mine.db");
         return true;
 
     }

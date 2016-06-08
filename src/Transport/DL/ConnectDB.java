@@ -14,7 +14,7 @@ public class ConnectDB {
 		Connection c = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:superlee");
+			c = DriverManager.getConnection("jdbc:sqlite:mine.db");
 			if (c!= null) System.out.println("Connection accepted!");
 		} catch ( Exception e ) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
