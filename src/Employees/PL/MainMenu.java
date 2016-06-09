@@ -16,7 +16,7 @@ public class MainMenu {
     public static final String ANSI_BLUEBG = "\u001B[44m";
 
 
-    public static void run(){
+    public static void run(int clearance){
         Scanner sc = new Scanner(System.in);
         header();
         int i= 1;

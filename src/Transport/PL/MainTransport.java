@@ -8,7 +8,7 @@ public class MainTransport {
 	private static TransportMenu transportMenu;
 	private static TruckMenu truckMenu;
 	private static PlaceMenu placeMenu;
-	
+	private static int clearance=-1;
 	
 	public MainTransport(){
 		itemMenu = new ItemMenu(this);
@@ -17,9 +17,9 @@ public class MainTransport {
 		placeMenu = new PlaceMenu(this);
 	}
 	
-	public void display(){
+	public void display(int clear){
 		System.out.println();
-
+		clearance=clear;
 		displayMenu();
 	}
 	

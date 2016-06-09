@@ -12,8 +12,8 @@ public class Main
     public static void main(String[] args)
     {
 
-        System.out.println("Welcome to this amazingly simple program...");
-        int clearence = Login();
+        System.out.println("Welcome!");
+        int clearance = Login();
         int choice = 0;
         while(choice != 5)
         {
@@ -45,22 +45,20 @@ public class Main
             switch(choice)
             {
                 case(1):
-                    Warehouse.run(clearence);
-                    clearence = Login();
+                    Warehouse.run(clearance);
+                    clearance = Login();
                     break;
                 case(2):
-                    Suppliers.run(clearence);
-                    clearence = Login();
+                    Suppliers.run(clearance);
+                    clearance = Login();
                     break;
                 case 3:
-                    Employees.PL.MainMenu.run();
-                    // Will be Employees.PL.MainMenu.run(); after implementing clearence in Employees and in Transportation
-                    clearence = Login();
+                    Employees.PL.MainMenu.run(clearance);
+                    clearance = Login();
                     break;
                 case 4:
-                    Transport.BL.Main.Run();
-                    // Will be Transport.BL.Main.Run(clearence); after implementing clearence in Employees and in Transportation
-                    clearence = Login();
+                    Transport.BL.Main.Run(clearance);
+                    clearance = Login();
                     break;
                 case(5):
                     System.out.println("Quitting! bye...  :(");
@@ -89,9 +87,9 @@ public class Main
     {
         System.out.println("Hello! Please log in to the system.");
         DBHandler dataHandler = new DBHandler();
-        int clearence = -1;
+        int clearance = -1;
         String Username,Password;
-        while(clearence == -1)
+        while(clearance == -1)
         {
             System.out.println("Username: ");
             Username = reader.next();
@@ -99,11 +97,11 @@ public class Main
                 System.exit(0);
             System.out.println("Password: ");
             Password = reader.next();
-            clearence = dataHandler.logIn(Username, Password);
-            if(clearence == -1)
+            clearance = dataHandler.logIn(Username, Password);
+            if(clearance == -1)
                 System.out.println("Something is not right... Please try again.");
         }
-        return clearence;
+        return clearance;
     }
 
 }

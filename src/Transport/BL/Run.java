@@ -32,10 +32,10 @@ public class Run {
 		transOrder=new TransOrder(db);
 	}
 
-	protected void run(){
+	protected void run(int clearance){
 		//launchTests();
 		MainTransport mainTransport=new MainTransport();
-		mainTransport.display();
+		mainTransport.display(clearance);
 		CloseDB.closeConnection();
 	}
 
