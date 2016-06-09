@@ -54,7 +54,7 @@ public class MainTransport {
 		case 5:
 			break;
 		case 6:
-			exit();
+			return;
 
 		default:
 			System.out.println("Invalid input");
@@ -80,7 +80,7 @@ public class MainTransport {
 			displayMenu();
 		}
 		else if (choice ==2){
-			exit();
+			return;
 		}
 		else {
 			System.out.println("The input you entered is Wrong");
