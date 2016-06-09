@@ -177,19 +177,13 @@ public class TransportMenu {
 
 		adjustDriver(truckPlateNum, startTime, date);
 
-		System.out.println("Step 5/7 - Please enter an Item ID: ");
-		itemID=itemExist();
-		itemsNumber(itemID, itemsHashMap, truckPlateNum);
-		otherItems(itemsHashMap, truckPlateNum);
-
-		
-		System.out.println("Step 6/7 - Please enter the Source Address ID: ");
+		System.out.println("Step 5/7 - Please enter the Source Address ID: ");
 		source = placeExist();
 		lastSource = source;
-		
-		System.out.println("Step 7/7 - Please enter the Destination Address ID: ");
+
+		System.out.println("Step 6/7 - Please enter the Destination Address ID: ");
 		tmpDest=placeExist();
-		
+
 		if (vectorDest.contains(tmpDest) || tmpDest == source){
 			System.out.println("Error, this address is already on the Transport Travel");
 		}
@@ -197,12 +191,18 @@ public class TransportMenu {
 			lastDest = tmpDest;
 			vectorDest.add(tmpDest);
 		}
-			
+
 		otherDestinations (vectorDest);
+
+		System.out.println("Step 7/7 - Please enter an Item ID: ");
+		itemID=itemExist();
+		itemsNumber(itemID, itemsHashMap, truckPlateNum);
+		otherItems(itemsHashMap, truckPlateNum);
+
 
 		@SuppressWarnings("rawtypes")
 		Enumeration en = vectorDest.elements();
-		
+
 		int transportID = Transport.BL.Run.transport.getLastTransportId();
 
 		Run.truck.setAvailability(truckPlateNum, 1); // the Truck is not Available Anymore
@@ -213,17 +213,17 @@ public class TransportMenu {
 				int dest = (int)en.nextElement();
 				int orderID = Transport.BL.Run.order.getLastOrderId();
 				order = Transport.BL.Run.order.add(orderID, source, dest);
-				
+
 				Set set = itemsHashMap.entrySet();
 			    Iterator iterator = set.iterator();
-			    
+
 			    while(iterator.hasNext()) {
 			        Map.Entry mentry = (Map.Entry)iterator.next();
 					transOrder = Transport.BL.Run.transOrder.add(transportID, orderID, (int)mentry.getKey(), (int)mentry.getValue());
 			      }
 				counter++;
 			}
-			
+
 			if (order && transOrder){
 				System.out.println(counter + " Orders Added Successfully!");
 				System.out.println("Transport Added Successfully!");

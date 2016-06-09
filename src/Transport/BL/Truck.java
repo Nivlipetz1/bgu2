@@ -254,7 +254,7 @@ public class Truck {
 		return ans;
 	}
 
-	public  void setAvailability (int truckPlateNum, int available){
+	public  void setAvailability (int truckPlateNum, int available){ // 0 available, 1 not available
 		try {
 			Statement st2=db.createStatement();
 			String sql2="UPDATE Truck SET Available = "+available +" WHERE TruckPlateNum = "+truckPlateNum+";";
@@ -293,6 +293,12 @@ public class Truck {
 			}
 		}
 
+		return ans;
+	}
+
+	public boolean returnTruck (int truckPlateNum, int itemID, int amount){
+		boolean ans = removeWeight(truckPlateNum, itemID, amount);
+		if (ans) setAvailability (truckPlateNum, 0);
 		return ans;
 	}
 
