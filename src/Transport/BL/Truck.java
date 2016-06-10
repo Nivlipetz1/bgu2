@@ -1,5 +1,6 @@
 package Transport.BL;
 import Employees.BL.BL_IMPL;
+import Employees.BackEnd.Employee;
 import Program.DriverInformations;
 
 import java.sql.*;
@@ -252,6 +253,19 @@ public class Truck {
 		return ans;
 	}
 
+	public HashMap <Integer, String> availableTruckByTruckPlateNumAndLicenceType(){
+		HashMap <Integer, String> ans = new HashMap <Integer, String>();
+		Vector <Integer> vectorAvailableTruck = getAvailablesTruck();
+		Enumeration en = vectorAvailableTruck.elements();
+		while (en.hasMoreElements()){
+			int truckPlateNum = (int)en.nextElement();
+			String licenceType = getLicenceType(truckPlateNum);
+			ans.put(truckPlateNum, licenceType);
+		}
+
+		return ans;
+	}
+	
 	public Vector <Integer> getBusyTruck (){
 		Vector<Integer> ans= new Vector<Integer>();
 		try {

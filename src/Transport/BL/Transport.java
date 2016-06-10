@@ -1,5 +1,9 @@
 package Transport.BL;
+import Program.OrderToTransport;
+
 import java.sql.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
 
 public class Transport {
@@ -126,7 +130,17 @@ public class Transport {
 	}
 
 
-	public boolean addOutcomingTransport(){
+	public boolean addOutcomingTransport(Vector<OrderToTransport> vectorOrderToTransport){
+
+		Enumeration en = vectorOrderToTransport.elements();
+		int transportID = getLastTransportId();
+
+		while (en.hasMoreElements()){
+
+		}
+
+
+
 		return true;
 	}
 
