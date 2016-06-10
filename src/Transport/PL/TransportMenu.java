@@ -182,11 +182,13 @@ public class TransportMenu {
 				Map.Entry mentry2 = (Map.Entry) iteratorItems.next();
 				int itemID = (int)mentry2.getKey();
 				int amount = (int)mentry.getValue();
+
+
 			}
 
 
 
-			if (Run.truck.canAddWeight(truckPlateNum,))
+
 
 
 
@@ -196,7 +198,11 @@ public class TransportMenu {
 		return true;
 	}
 
+	private boolean manageItemsTransport(int transportID, int orderID, int truckPlateNum, int itemID, int amount){ // 0 successfull, 1 split
+		boolean split = false;
 
+
+	}
 
 
 
