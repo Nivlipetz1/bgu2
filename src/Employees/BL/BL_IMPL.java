@@ -180,6 +180,7 @@ public class BL_IMPL implements IBL, DriverInformations {
     }
 
 
+
     /*Driver Information functions*/
 
     /**
@@ -189,6 +190,12 @@ public class BL_IMPL implements IBL, DriverInformations {
      * @return need to check if drvier with lisenceType is available based on shift availibility.
      *          if driver is availible in the shift avail and he is not scheduled for a shift then return true.
      */
+
+    @Override
+    public HashMap<Employee, Integer> getAllAvailablesDriversAccordingToAvailablesTrucks(HashMap <Integer, String> availableTruckByTruckPlateNumAndLicenceType) { // The first element is the Available Driver, and the Second is the TruckID
+        return null; //TODO
+    }
+
     @Override
     public boolean isDriverAvailable(String licenceType, LocalTime time, LocalDate date) {
         Shift curShift = SQLDAL.getShift(date, time);

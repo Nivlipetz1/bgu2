@@ -10,10 +10,13 @@ import java.util.*;
 public class Truck {
 	private Connection db;
 	private static DriverInformations driverInformations = new BL_IMPL();
+	public Vector<Integer> availableTrucks;
+
 
 
 	public Truck(Connection db){
 		this.db=db;
+		availableTrucks= new Vector<Integer>();
 	}
 
 	//available 0=Available, 1=Busy
@@ -142,6 +145,27 @@ public class Truck {
 		}
 		return ans;
 	}
+
+	public int amountMaxToTrans (int truckPlateNum, int itemID, int weight){
+		int actualTruckWeight;
+		int maxTruckWeight;
+		int weightAllowed=1;
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT ActualWeight,MaxWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
+			ResultSet rs = st.executeQuery(sql);
+
+			actualTruckWeight = rs.getInt("ActualWeight");
+			maxTruckWeight = rs.getInt("MaxWeight");
+			weightAllowed = maxTruckWeight - actualTruckWeight;
+
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		return (weight / weightAllowed);
+	}
 	
 	public void weightInformations (int truckPlateNum){
 		int actualTruckWeight;
@@ -164,7 +188,7 @@ public class Truck {
 		}
 	}
 
-	public  boolean addWeight (int truckPlateNum, int itemID, int amount){
+	public boolean addWeight (int truckPlateNum, int itemID, int amount){
 		boolean ans = true;
 		int actualTruckWeight;
 		int itemWeight=0;
@@ -253,7 +277,7 @@ public class Truck {
 		return ans;
 	}
 
-	public HashMap <Integer, String> availableTruckByTruckPlateNumAndLicenceType(){
+	public HashMap <Integer, String> getAvailableTruckByTruckPlateNumAndLicenceType(){
 		HashMap <Integer, String> ans = new HashMap <Integer, String>();
 		Vector <Integer> vectorAvailableTruck = getAvailablesTruck();
 		Enumeration en = vectorAvailableTruck.elements();
@@ -265,7 +289,7 @@ public class Truck {
 
 		return ans;
 	}
-
+	
 	public Vector <Integer> getBusyTruck (){
 		Vector<Integer> ans= new Vector<Integer>();
 		try {

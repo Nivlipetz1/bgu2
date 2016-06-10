@@ -5,7 +5,9 @@ import Employees.BL.IBL;
 import Employees.BackEnd.Driver;
 import Employees.BackEnd.Employee;
 import Program.DriverInformations;
+import Program.OrderToTransport;
 import Transport.BL.Run;
+import Transport.BL.Truck;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,6 +21,7 @@ public class TransportMenu {
 	private static int lastSource;
 	private static int day;
 	private static int driverID, truckPlateNum;
+	private static int amountToTakeInNextOrder;
 	private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
 	private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
 	private static DriverInformations driverInformations = new BL_IMPL();
@@ -34,8 +37,8 @@ public class TransportMenu {
 		System.out.println("Transport Options");
 		System.out.println("Please enter your choice: ");
 		System.out.println();
-		System.out.println("1- Add an Outcoming Transport");
-		System.out.println("2- Add an Incoming Transport");
+		//System.out.println("1- Add an Outcoming Transport");
+		//System.out.println("2- Add an Incoming Transport");
 		System.out.println("3- List of all Transports");
 		System.out.println("4- Back to Menu");
 		System.out.println();
@@ -140,7 +143,7 @@ public class TransportMenu {
 
 		}
 
-	
+
 	private void addTransport(int day){
 		Vector <Integer> vectorDest = new Vector<Integer>();
 		HashMap <Integer, Integer> itemsHashMap = new HashMap <Integer, Integer>();
@@ -219,7 +222,7 @@ public class TransportMenu {
 
 			    while(iterator.hasNext()) {
 			        Map.Entry mentry = (Map.Entry)iterator.next();
-					transOrder = Transport.BL.Run.transOrder.add(transportID, orderID, (int)mentry.getKey(), (int)mentry.getValue());
+					transOrder = Transport.BL.Run.transOrder.add(transportID, orderID, (int)mentry.getKey(), (int)mentry.getValue(), 0);
 			      }
 				counter++;
 			}
