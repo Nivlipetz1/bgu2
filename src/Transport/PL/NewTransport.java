@@ -193,7 +193,7 @@ public class NewTransport {
 
             transOrder =  Transport.BL.Run.transOrder.add(transportID, orderID, itemID, amountAllowed, 1);
 
-            itemsHashMap.remove(itemID);
+            itemsHashMap.remove(itemID) ;
             itemsHashMap.put(itemID, amountToTakeInNextOrder); // we are updating the HM
 
 
