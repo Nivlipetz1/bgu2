@@ -12,7 +12,7 @@ public class OrderToTransport {
     private LocalDate date;
     private LocalTime startTime;
     private int sourceId; // the source adress of the transport
-    private Vector<Integer> vectorDest = new Vector<Integer>(); // vector of all destinations of the transport
+    private int destId;
     private HashMap<Integer, Integer> itemsHashMap = new HashMap <Integer, Integer>(); // hashMap of items, when the first Integer is ItemID, and the second is the amount of it
 
     public OrderToTransport(int orderID, LocalDate date, LocalTime startTime, int sourceId, Vector<Integer> vectorDest, HashMap<Integer, Integer> itemsHashMap) {
@@ -20,7 +20,7 @@ public class OrderToTransport {
         this.date = date;
         this.startTime = startTime;
         this.sourceId = sourceId;
-        this.vectorDest = vectorDest;
+        this.destId = destId;
         this.itemsHashMap = itemsHashMap;
     }
 
@@ -40,8 +40,8 @@ public class OrderToTransport {
         return sourceId;
     }
 
-    public Vector<Integer> getVectorDest() {
-        return vectorDest;
+    public int getDestId() {
+        return destId;
     }
 
     public HashMap<Integer, Integer> getItemsHashMap() {

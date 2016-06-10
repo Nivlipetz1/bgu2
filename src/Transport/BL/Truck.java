@@ -10,10 +10,13 @@ import java.util.*;
 public class Truck {
 	private Connection db;
 	private static DriverInformations driverInformations = new BL_IMPL();
+	public Vector<Integer> availableTrucks;
+
 
 
 	public Truck(Connection db){
 		this.db=db;
+		availableTrucks= new Vector<Integer>();
 	}
 
 	//available 0=Available, 1=Busy
@@ -164,7 +167,7 @@ public class Truck {
 		}
 	}
 
-	public  boolean addWeight (int truckPlateNum, int itemID, int amount){
+	public boolean addWeight (int truckPlateNum, int itemID, int amount){
 		boolean ans = true;
 		int actualTruckWeight;
 		int itemWeight=0;
@@ -253,7 +256,7 @@ public class Truck {
 		return ans;
 	}
 
-	public HashMap <Integer, String> availableTruckByTruckPlateNumAndLicenceType(){
+	public HashMap <Integer, String> getAvailableTruckByTruckPlateNumAndLicenceType(){
 		HashMap <Integer, String> ans = new HashMap <Integer, String>();
 		Vector <Integer> vectorAvailableTruck = getAvailablesTruck();
 		Enumeration en = vectorAvailableTruck.elements();

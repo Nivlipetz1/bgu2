@@ -5,7 +5,9 @@ import Employees.BL.IBL;
 import Employees.BackEnd.Driver;
 import Employees.BackEnd.Employee;
 import Program.DriverInformations;
+import Program.OrderToTransport;
 import Transport.BL.Run;
+import Transport.BL.Truck;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -140,7 +142,66 @@ public class TransportMenu {
 
 		}
 
-	
+	public static  boolean addOutcomingTransport (Vector<OrderToTransport> vectorOrderToTransport){
+		int transportID = Transport.BL.Run.transport.getLastTransportId();
+		return addOutcomingTransport (vectorOrderToTransport, transportID);
+	}
+
+	public static boolean addOutcomingTransport(Vector<OrderToTransport> vectorOrderToTransport, int transportID){
+		boolean ans = false, order=true, transOrder=true;
+		int counterOrder = 0;
+
+		HashMap <Integer, String> availableTruckByTruckPlateNumAndLicenceType = Run.truck.getAvailableTruckByTruckPlateNumAndLicenceType();
+		HashMap<Employee, Integer> hashMapAvailablesDrivers = driverInformations.getAllAvailablesDriversAccordingToAvailablesTrucks(availableTruckByTruckPlateNumAndLicenceType);
+
+		Set set = hashMapAvailablesDrivers.entrySet();
+		Iterator iteratorDriver = set.iterator();
+
+		Map.Entry mentry = (Map.Entry)iteratorDriver.next();
+
+		Employee employee =  (Employee)mentry.getKey();
+		int driverID = employee.getId();
+		int truckPlateNum =  (int)mentry.getValue();
+
+		Run.truck.setAvailability(truckPlateNum, 1); // the Truck is not Available Anymore
+
+		Enumeration en = vectorOrderToTransport.elements();
+		while (en.hasMoreElements()) { // while do we have some orders to transport
+			OrderToTransport nextOrder = (OrderToTransport)en.nextElement();
+			int orderID = nextOrder.getOrderID();
+			int source = nextOrder.getSourceId();
+			int dest = nextOrder.getDestId();
+			LocalDate date = nextOrder.getDate();
+			LocalTime startTime = nextOrder.getStartTime();
+
+			HashMap<Integer, Integer> itemsHashMap = nextOrder.getItemsHashMap();
+			Set set2 = itemsHashMap.entrySet();
+			Iterator iteratorItems = set.iterator(); // all the items in the same order
+
+			while (iteratorItems.hasNext()) { // while do we have items to send in this order
+				Map.Entry mentry2 = (Map.Entry) iteratorItems.next();
+				int itemID = (int)mentry2.getKey();
+				int amount = (int)mentry.getValue();
+			}
+
+
+
+			if (Run.truck.canAddWeight(truckPlateNum,))
+
+
+
+		}
+
+
+		return true;
+	}
+
+
+
+
+
+
+
 	private void addTransport(int day){
 		Vector <Integer> vectorDest = new Vector<Integer>();
 		HashMap <Integer, Integer> itemsHashMap = new HashMap <Integer, Integer>();

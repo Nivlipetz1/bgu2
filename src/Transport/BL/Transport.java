@@ -1,8 +1,12 @@
 package Transport.BL;
+import Employees.BackEnd.Employee;
 import Program.OrderToTransport;
+import Program.DriverInformations;
+
 
 import java.sql.*;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Vector;
 
 
@@ -128,22 +132,6 @@ public class Transport {
 			System.exit(0);
 		}
 	}
-
-
-	public boolean addOutcomingTransport(Vector<OrderToTransport> vectorOrderToTransport){
-
-		Enumeration en = vectorOrderToTransport.elements();
-		int transportID = getLastTransportId();
-
-		while (en.hasMoreElements()){
-
-		}
-
-
-
-		return true;
-	}
-
 
 
 
