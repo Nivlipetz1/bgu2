@@ -37,8 +37,8 @@ public class TransportMenu {
 		System.out.println("Transport Options");
 		System.out.println("Please enter your choice: ");
 		System.out.println();
-		System.out.println("1- Add an Outcoming Transport");
-		System.out.println("2- Add an Incoming Transport");
+		//System.out.println("1- Add an Outcoming Transport");
+		//System.out.println("2- Add an Incoming Transport");
 		System.out.println("3- List of all Transports");
 		System.out.println("4- Back to Menu");
 		System.out.println();

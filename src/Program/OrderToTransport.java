@@ -15,12 +15,12 @@ public class OrderToTransport {
     private int destId;
     private HashMap<Integer, Integer> itemsHashMap = new HashMap <Integer, Integer>(); // hashMap of items, when the first Integer is ItemID, and the second is the amount of it
 
-    public OrderToTransport(int orderID, LocalDate date, LocalTime startTime, int sourceId, Vector<Integer> vectorDest, HashMap<Integer, Integer> itemsHashMap) {
+    public OrderToTransport(int orderID, LocalDate date, LocalTime startTime, int sourceId, int destID, HashMap<Integer, Integer> itemsHashMap) {
         this.orderID = orderID;
         this.date = date;
         this.startTime = startTime;
         this.sourceId = sourceId;
-        this.destId = destId;
+        this.destId = destID;
         this.itemsHashMap = itemsHashMap;
     }
 
