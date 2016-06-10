@@ -289,7 +289,7 @@ public class Truck {
 
 		return ans;
 	}
-	
+
 	public Vector <Integer> getBusyTruck (){
 		Vector<Integer> ans= new Vector<Integer>();
 		try {

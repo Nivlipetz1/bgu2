@@ -188,7 +188,7 @@ public class NewTransport {
             int weightOfASingleProduct = 5; //TODO !!!!
             int amountAllowed = Run.truck.amountMaxToTrans(truckPlateNum, itemID, weightOfASingleProduct); // we check how many product we can take on this transport
             Run.truck.addWeight(truckPlateNum, itemID, amountAllowed);
-            amountToTakeInNextOrder = amount - amountAllowed;
+            amountToTakeInNextOrder = (amount - amountAllowed);
             splitted = true;
 
             transOrder =  Transport.BL.Run.transOrder.add(transportID, orderID, itemID, amountAllowed, 1);
