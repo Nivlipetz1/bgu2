@@ -145,6 +145,27 @@ public class Truck {
 		}
 		return ans;
 	}
+
+	public int amountMaxToTrans (int truckPlateNum, int itemID, int weight){
+		int actualTruckWeight;
+		int maxTruckWeight;
+		int weightAllowed=1;
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT ActualWeight,MaxWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
+			ResultSet rs = st.executeQuery(sql);
+
+			actualTruckWeight = rs.getInt("ActualWeight");
+			maxTruckWeight = rs.getInt("MaxWeight");
+			weightAllowed = maxTruckWeight - actualTruckWeight;
+
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		return (weight / weightAllowed);
+	}
 	
 	public void weightInformations (int truckPlateNum){
 		int actualTruckWeight;

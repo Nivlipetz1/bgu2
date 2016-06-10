@@ -21,6 +21,7 @@ public class TransportMenu {
 	private static int lastSource;
 	private static int day;
 	private static int driverID, truckPlateNum;
+	private static int amountToTakeInNextOrder;
 	private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
 	private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
 	private static DriverInformations driverInformations = new BL_IMPL();
@@ -183,6 +184,14 @@ public class TransportMenu {
 				int itemID = (int)mentry2.getKey();
 				int amount = (int)mentry.getValue();
 
+				int manageItemsTransport = manageItemsTransport (transportID, orderID, truckPlateNum, itemID, amount);
+				if (manageItemsTransport == -1){
+					System.out.println("Error");
+					break;
+				}
+				else if (manageItemsTransport == 1){ // means that we split the order
+					return addOutcomingTransport (vectorOrderToTransport, transportID);
+				}
 
 			}
 
@@ -198,10 +207,24 @@ public class TransportMenu {
 		return true;
 	}
 
-	private boolean manageItemsTransport(int transportID, int orderID, int truckPlateNum, int itemID, int amount){ // 0 successfull, 1 split
-		boolean split = false;
-
-
+	private static int manageItemsTransport(int transportID, int orderID, int truckPlateNum, int itemID, int amount){ // 0 successfull, 1 split, -1 problem
+		boolean split = false, transOrder=true;
+		int ans= -1;
+		if (Run.truck.canAddWeight(truckPlateNum, itemID, amount)){ // if we can add all the items in the truck
+			Run.truck.addWeight(truckPlateNum, itemID, amount);
+			amountToTakeInNextOrder=0;
+			transOrder =  Transport.BL.Run.transOrder.add(transportID, orderID, itemID, amount, 0);
+			if (transOrder) ans = 0;
+		}
+		else { // in the case we don't have enough weight
+			int weightOfASingleProduct = 5; //TODO !!!!
+			int amountAllowed = Run.truck.amountMaxToTrans(truckPlateNum, itemID, weightOfASingleProduct); // we check how many product we can take on this transport
+			Run.truck.addWeight(truckPlateNum, itemID, amountAllowed);
+			amountToTakeInNextOrder = amount - amountAllowed;
+			transOrder =  Transport.BL.Run.transOrder.add(transportID, orderID, itemID, amountAllowed, 1);
+			if (transOrder) ans = 1;
+		}
+		return ans;
 	}
 
 
@@ -286,7 +309,7 @@ public class TransportMenu {
 
 			    while(iterator.hasNext()) {
 			        Map.Entry mentry = (Map.Entry)iterator.next();
-					transOrder = Transport.BL.Run.transOrder.add(transportID, orderID, (int)mentry.getKey(), (int)mentry.getValue());
+					transOrder = Transport.BL.Run.transOrder.add(transportID, orderID, (int)mentry.getKey(), (int)mentry.getValue(), 0);
 			      }
 				counter++;
 			}

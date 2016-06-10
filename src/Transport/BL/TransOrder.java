@@ -9,12 +9,12 @@ public class TransOrder {
 		this.db=db;
 	}
 	
-	public boolean add(int transportID,int orderID, int itemID, int numOfItems){
+	public boolean add(int transportID,int orderID, int itemID, int numOfItems, int orderSplit){ //dont split = orderSplit 0, split = orderSplit 1
 		boolean ans=true;
 		try {
 			Statement st=db.createStatement();
-			String sql="INSERT INTO TransOrder(TransportID,OrderID,ItemID,NumOfItems)"+
-						" VALUES("+transportID+","+orderID+","+itemID+","+numOfItems+");";
+			String sql="INSERT INTO TransOrder(TransportID,OrderID,ItemID,NumOfItems, OrderSplit)"+
+						" VALUES("+transportID+","+orderID+","+itemID+","+numOfItems+","+orderSplit+");";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 		} catch (SQLException e) {
@@ -41,7 +41,6 @@ public class TransOrder {
 		}
 
 		return ans;
-		
 	}
 	
 
