@@ -235,6 +235,40 @@ public class Truck {
 		return ans;
 	}
 
+	public Vector <Integer> getAvailablesTruck (){
+		Vector<Integer> ans= new Vector<Integer>();
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT TruckPlateNum FROM Truck WHERE Available=0;";
+			ResultSet rs = st.executeQuery(sql);
+			while (rs.next()){
+				ans.add(rs.getInt("TruckPlateNum"));
+			}
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		return ans;
+	}
+
+	public Vector <Integer> getBusyTruck (){
+		Vector<Integer> ans= new Vector<Integer>();
+		try {
+			Statement st=db.createStatement();
+			String sql="SELECT TruckPlateNum FROM Truck WHERE Available=1;";
+			ResultSet rs = st.executeQuery(sql);
+			while (rs.next()){
+				ans.add(rs.getInt("TruckPlateNum"));
+			}
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		return ans;
+	}
+
 	public boolean isTruckAvailable (int truckPlateNum){
 		boolean ans = false;
 		try {
