@@ -124,7 +124,18 @@ public class Transport {
 			System.exit(0);
 		}
 	}
-	
+
+
+	public boolean addOutcomingTransport(){
+		return true;
+	}
+
+
+
+
+
+
+
 	public void listOfTransport(){
 		try {
 			Statement st=db.createStatement();
