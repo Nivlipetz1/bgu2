@@ -74,6 +74,12 @@ public class WarehouseModule implements IWarehouseModule
 		return db.PutItems(toAdd);
 	}
 
+	@Override
+	public String printPendingOrders()
+	{
+		return db.printPendingOrders();
+	}
+
 	public String printFaulty()
 	{
 		return db.printFaulty();

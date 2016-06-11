@@ -1,10 +1,12 @@
 package Stock.data;
 import java.sql.*;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
 
 
+import Program.OrderToTransport;
 import Stock.common.Category;
 import Stock.common.Product;
 import Stock.common.Tree;
@@ -21,6 +23,7 @@ import Stock.supplierManagement.SupplierCard;
 import Stock.supplierManagement.SupplierContact;
 import Stock.supplyOrder.ItemPricing;
 import Program.Main;
+import Transport.PL.NewTransport;
 
 public class DBHandler implements Dbms {
 	
@@ -43,9 +46,9 @@ public class DBHandler implements Dbms {
 		}
 		if(DEBUG)
 			createTables(true);
-		
-		
-		CategoryTree = new Tree();
+
+
+        CategoryTree = new Tree();
 		List Categories = ExecuteList("Select * FROM Categories;", 1);
 		Category[] CatArr = new Category[Categories.size()];
 		Categories.toArray(CatArr);
@@ -236,27 +239,27 @@ public class DBHandler implements Dbms {
 	
 	private void fillDatabase() throws SQLException
 	{
-		execUpdateSQL("INSERT INTO `agreement_days` (agreement_id,day) VALUES (5,0), (5,1), (5,2), (5,3), (5,4), (5,5);");
-		execUpdateSQL("insert INTO `categories` (ID,Name,ParentCategory) VALUES (1,'Dairy',NULL), (2,'IceCream',1), (3,'Meat',NULL), (4,'Steaks',3)");
-		execUpdateSQL("INSERT INTO `Product` (ID,name,MinInStock,Maker,Category,MaxInStock,Expected) VALUES (1,'Milk',20,'Tnuva',1,100,0),"+
+		execUpdateSQL("INSERT OR IGNORE INTO `agreement_days` (agreement_id,day) VALUES (5,0), (5,1), (5,2), (5,3), (5,4), (5,5)");
+		execUpdateSQL("insert OR IGNORE INTO `categories` (ID,Name,ParentCategory) VALUES (1,'Dairy',NULL), (2,'IceCream',1), (3,'Meat',NULL), (4,'Steaks',3)");
+		execUpdateSQL("INSERT OR IGNORE INTO `Product` (ID,name,MinInStock,Maker,Category,MaxInStock,Expected) VALUES (1,'Milk',20,'Tnuva',1,100,0),"+
 				"(2,'Sinta',10,'REDRED',4,300,0),"+
 				"(3,'ChocolateIceCream',50,'Nestle',2,120,0)");
-		execUpdateSQL("insert INTO `Users` (ID,Username,Password,Clearence) VALUES (1,'Admin','Admin',1), (2,'User','User',0)");
-		execUpdateSQL("insert INTO `ProductInStock` (ID,ExpirationDate,AmountInStock) VALUES (1,'2018-10-24',9), (2,'2022-12-15',100), (3,'2016-10-10',40)");
+		execUpdateSQL("insert OR IGNORE INTO `Users` (ID,Username,Password,Clearence) VALUES (1,'Admin','Admin',1), (2,'User','User',0)");
+		execUpdateSQL("insert OR IGNORE INTO `ProductInStock` (ID,ExpirationDate,AmountInStock) VALUES (1,'2018-10-24',9), (2,'2022-12-15',100), (3,'2016-10-10',40)");
 		for (int i = 1; i <= 5; i++)
 		{
-			execUpdateSQL("INSERT INTO supplier_cards (serial_number,Name, Bank_account, Payment_terms,address) VALUES ("+i+",'sup"+i+"',"+i+",'Yearly','somewhere')");
+			execUpdateSQL("INSERT OR IGNORE INTO supplier_cards (serial_number,Name, Bank_account, Payment_terms,address) VALUES ("+i+",'sup"+i+"',"+i+",'Yearly','somewhere')");
 			for (int j = 1; j <= 3; j++)
 			{
 				System.out.println(i+", "+j);
-				execUpdateSQL("INSERT INTO agreements (is_transport_by_supplier,supplier_serial_number,id) VALUES (" + 1+","+i+","+(j+i*4)+")");
-				execUpdateSQL("INSERT INTO supplier_catalouge_item (serial_number,ID,name,manufacturer_name,catalouge_id) VALUES ("+i+","+j+",'Milk"+i+"','Tnuva"+i+"',1)");
-				execUpdateSQL("INSERT INTO agreement_items (agreement_id,catalouge_num,price) VALUES ("+(j+i*4)+","+1+",10),("+(j+i*4)+","+2+",20),("+(j+i*4)+","+3+",30)");
+				execUpdateSQL("INSERT OR IGNORE INTO agreements (is_transport_by_supplier,supplier_serial_number,id) VALUES (" + 1+","+i+","+(j+i*4)+")");
+				execUpdateSQL("INSERT OR IGNORE INTO supplier_catalouge_item (serial_number,name,manufacturer_name,catalouge_id) VALUES ("+i+",'Milk"+i+"','Tnuva"+i+"',1)");
+				execUpdateSQL("INSERT OR IGNORE INTO agreement_items (agreement_id,catalouge_num,price) VALUES ("+(j+i*4)+","+1+",10),("+(j+i*4)+","+2+",20),("+(j+i*4)+","+3+",30)");
 				
 				for (int j2 = 1; j2 <= 2; j2++)
 				{
 					execUpdateSQL(
-							"INSERT INTO agreement_item_discount (agreement_id, catalouge_num,min_quantity,discount) VALUES ("
+							"INSERT OR IGNORE INTO agreement_item_discount (agreement_id, catalouge_num,min_quantity,discount) VALUES ("
 									+ (j+i*4) + "," + j2 + ",10," + ((10.0 - j2) / 10.0) + ")");
 				}
 				
@@ -293,7 +296,7 @@ public class DBHandler implements Dbms {
 		String date="'";
 		Calendar tmp = Main.today;
 		date+=tmp.get(Calendar.YEAR)+"-";
-		date+=(tmp.get(Calendar.MONTH)<10)? "0"+tmp.get(Calendar.MONTH) : tmp.get(Calendar.MONTH);
+		date+=((tmp.get(Calendar.MONTH)+1)<10)? "0"+(tmp.get(Calendar.MONTH)+1) : (tmp.get(Calendar.MONTH)+1);
 		date+="-";
 		date+=(tmp.get(Calendar.DAY_OF_MONTH)<10)? "0"+tmp.get(Calendar.DAY_OF_MONTH) : tmp.get(Calendar.DAY_OF_MONTH);
 		return date+"'";
@@ -1204,7 +1207,7 @@ public class DBHandler implements Dbms {
 			ResultSet resultSet = null;
 			try {
 				statement = conn.createStatement();
-				if(statement.execute("SELECT Product.ID,Product.name,agreement_items.price,discount,discount*price*"+item.getQuantity()+" as finalPrice,agreements.supplier_serial_number,agreements.ID FROM (((( Product join supplier_catalouge_item on Product.ID=supplier_catalouge_item.ID) "
+				if(statement.execute("SELECT Product.ID,Product.name,agreement_items.price,discount,discount*price*"+item.getQuantity()+" as finalPrice,agreements.supplier_serial_number,agreements.ID FROM (((( Product join supplier_catalouge_item on Product.ID=supplier_catalouge_item.serial_number) "
 						+ " join agreements on agreements.supplier_serial_number=supplier_catalouge_item.serial_number) join agreement_items on agreement_items.catalouge_num) "
 						+ " join agreement_item_discount on agreement_item_discount.agreement_id=agreements.id AND "
 						+ " agreement_items.catalouge_num=agreement_item_discount.catalouge_num AND agreement_item_discount.min_quantity <= "+item.getQuantity()+") "
@@ -1239,8 +1242,22 @@ public class DBHandler implements Dbms {
 					execUpdateSQL("INSERT INTO ItemsInOrder (OID,ID,Name,Amount,CatalogPrice,Discount,FinalPrice) VALUES"
 							+ " ("+OrdID+","+ID+",'"+Name+"',"+Amount+","+CatalogPrice+","+discount+","+finalPrice+")");
 					execUpdateSQL("UPDATE Product SET Expected=Expected+"+Amount+" WHERE ID="+ID);
+
+
+                    Vector<OrderToTransport> vectorOrderToTransport = new Vector<OrderToTransport>();
+
+                    HashMap<Integer,Integer> itemsHash = new HashMap<Integer, Integer>();
+                    itemsHash.put(ID,Amount);
+                    int source = ExecuteScalarQuery("SELECT ID FROM Place,supplier_cards WHERE Place.address=supplier_cards.address AND supplier_cards.serial_number="+supplier_serial_number);
+                    int dest = ExecuteScalarQuery("SELECT ID FROM Place WHERE Place.address='SuperLee'");
+                    OrderToTransport ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.now(),source,dest,itemsHash);
+                    vectorOrderToTransport.add(ott);
+                    //NewTransport.addOutcomingTransport(vectorOrderToTransport);
 				}
-				
+				else
+                {
+                    int i = 5;
+                }
 				
 				
 			} catch (SQLException e) {
@@ -1257,9 +1274,11 @@ public class DBHandler implements Dbms {
 			}
 		}
 	}
-	
-	
-	private void ExecuteNonQuery(String queryString) {
+
+
+
+
+    private void ExecuteNonQuery(String queryString) {
 		Statement statement = null;
 		try {
 			statement = conn.createStatement();
@@ -1286,7 +1305,20 @@ public class DBHandler implements Dbms {
 	private List ExecuteList(String queryString, int type) {
 		Statement statement = null;
 		ResultSet resultSet = null;
-		List answer = (type == 0) ? new LinkedList<Product>() : new LinkedList<Category>();
+        List answer;
+        switch (type){
+        case(0):
+            answer = new LinkedList<Product>();
+            break;
+        case(1):
+            answer = new LinkedList<Category>();
+            break;
+        case(2):
+            answer = new LinkedList<Integer>();
+            break;
+        default:
+            return null;
+        }
 		try {
 			statement = conn.createStatement();
 			
@@ -1455,6 +1487,10 @@ public class DBHandler implements Dbms {
 			if (type == 1) {
 				lst.add(new Category(rs.getInt(1), rs.getInt(3)));
 			}
+            if(type == 2)
+            {
+                lst.add(new Integer(rs.getInt("OrdID")));
+            }
 		}
 	}
 	
@@ -1701,4 +1737,51 @@ public class DBHandler implements Dbms {
 	{
 		ExecuteNonQuery("Delete From faultyProduct;");
 	}
+
+    public String printPendingOrders()
+    {
+        StringBuilder builder = new StringBuilder();
+        List<Integer> orderIDs;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        orderIDs = ExecuteList("SELECT OrdID FROM Orders",2);
+        if(orderIDs == null)
+            return "There are no pending orders!";
+        for(Integer i : orderIDs)
+        {
+            builder.append("Order Number: "+i+"\n");
+
+            try {
+                statement = conn.createStatement();
+
+                if (statement.execute("SELECT ID,Name,Amount,CatalogPrice,Discount,FinalPrice FROM ItemsInOrder WHERE OID="+i))
+                    resultSet = statement.getResultSet();
+
+
+                int columns = resultSet.getMetaData().getColumnCount();
+                if (columns == 0)
+                    continue;
+                builder.append("ID\t|\tName\t|\tAmount\t|\tCatalogPrice\t|\tDiscount\t|\tFinalPrice\t\n");
+                while (resultSet.next())
+                {
+                    builder.append(resultSet.getInt("ID")+"\t|\t"+resultSet.getString("Name")+"\t|\t"+resultSet.getInt("Amount")+"\t\t|\t\t"+resultSet.getInt("CatalogPrice")+"\t\t\t|\t\t"+resultSet.getDouble("Discount")+"\t\t|\t\t"+resultSet.getInt("FinalPrice")+"\t\t|\n");
+                }
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if (statement != null) {
+                    try {
+                        statement.close();
+                    } catch (SQLException sqlEx) {
+                    }
+                }// ignore
+
+                statement = null;
+            }
+
+
+        }
+        return builder.toString();
+    }
 }

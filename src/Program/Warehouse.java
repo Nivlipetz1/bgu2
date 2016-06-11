@@ -16,7 +16,7 @@ public class Warehouse
 	private static Scanner reader = new Scanner(System.in);
 	private static WarehouseModule wh = new WarehouseModule();
 	private enum MainMenu { Reports, AddItems, TakeItems, LogOut, Quit };
-	private enum ReportsMenu { EntireStock, OneCategory, RecursiveOneCategory, FaultyItems, MainMenu, Quit };
+	private enum ReportsMenu { EntireStock, OneCategory, RecursiveOneCategory, PendingOrders,FaultyItems, MainMenu, Quit };
 	private static int clearence=-1;
 	
 	public static void run(int cl)
@@ -146,13 +146,16 @@ public class Warehouse
 				catID = PrintAndReadCategory();
 				PrintReport(catID, true);
 				break;
-			case 3:
-				faultyItems();
+			case(3):
+				printPendingOrders();
 				break;
 			case 4:
+				faultyItems();
+				break;
+			case 5:
 				//Return to the main menu method.
 				return;
-			case 5:
+			case 6:
 				System.exit(0);
 				break;
 			default:
@@ -161,6 +164,12 @@ public class Warehouse
 			}
 		}
 	}
+
+	private static void printPendingOrders()
+	{
+		System.out.println(wh.printPendingOrders());
+	}
+
 	public static void faultyItems()
 	{
 		wh.UpdateFaulty();
