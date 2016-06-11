@@ -1489,7 +1489,7 @@ public class DBHandler implements Dbms {
 			}
             if(type == 2)
             {
-                lst.add(new Integer(rs.getInt("OrdID")));
+                lst.add(new Integer(rs.getInt("OrderID")));
             }
 		}
 	}
@@ -1784,4 +1784,55 @@ public class DBHandler implements Dbms {
         }
         return builder.toString();
     }
+
+	public void insertTransportToWarehouse(int transportID)
+	{
+		List<Integer> orderIDs;
+		Statement statement = null;
+		ResultSet resultSet = null;
+		orderIDs = ExecuteList("SELECT OrderID FROM TransOrder",2);
+		if(orderIDs == null)
+			return;
+		for(Integer i : orderIDs)
+		{
+			try {
+				statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY);
+
+				if (statement.execute("SELECT ItemID,NumOfItems FROM TransOrder WHERE TransportID="+transportID+" AND OrderID="+i))
+					resultSet = statement.getResultSet();
+				if(resultSet==null)
+					continue;
+				int columns = resultSet.getMetaData().getColumnCount();
+				if (columns == 0)
+				{
+					resultSet.close();
+					continue;
+				}
+				while (resultSet.next())
+				{
+					int NumOfItems = resultSet.getInt("NumOfItems");
+					int ItemID =resultSet.getInt("ItemID");
+					execUpdateSQL("UPDATE ItemsInOrder SET Amount=Amount-"+NumOfItems+" WHERE OID="+i+" AND ID="+ItemID);
+					execUpdateSQL("UPDATE Product SET Expected=Expected-"+NumOfItems);
+					execUpdateSQL("INSERT INTO ProductInStock (ID,ExpirationDate,AmountInStock) VALUES ("+ItemID+", date('now','+4 month'),"+NumOfItems+")");
+				}
+				execUpdateSQL("DELETE FROM ItemsInOrder WHERE OID="+i+" AND Amount<=0");
+				execUpdateSQL("DELETE FROM Orders WHERE Orders.OrdID NOT IN (SELECT DISTINCT OID FROM ItemsInOrder)");
+				resultSet.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				if (statement != null) {
+					try {
+						statement.close();
+					} catch (SQLException sqlEx) {
+					}
+				}// ignore
+				statement = null;
+			}
+		}
+		/*
+		@TODO Here we need to send a message to Transport to return their truck (transportID)!
+		 */
+	}
 }

@@ -1,6 +1,5 @@
 package Program;
 
-import Stock.data.*;
 import Stock.modul.StockReport;
 import Stock.modul.SuppliersModule;
 import Stock.modul.WarehouseModule;
@@ -15,13 +14,13 @@ public class Warehouse
 	public static boolean running = true;
 	private static Scanner reader = new Scanner(System.in);
 	private static WarehouseModule wh = new WarehouseModule();
-	private enum MainMenu { Reports, AddItems, TakeItems, LogOut, Quit };
+	private enum MainMenu { Reports, AddItems, TakeItems, IncomingTransport, LogOut, Quit };
 	private enum ReportsMenu { EntireStock, OneCategory, RecursiveOneCategory, PendingOrders,FaultyItems, MainMenu, Quit };
-	private static int clearence=-1;
+	private static int clearance =-1;
 	
 	public static void run(int cl)
 	{
-		clearence = cl;
+		clearance = cl;
 		Menu();
 	}
 	
@@ -47,9 +46,12 @@ public class Warehouse
 				TakeItems();
 				break;
 			case 3:
-				running = false;
+				incomingTransport();
 				break;
 			case 4:
+				running = false;
+				break;
+			case 5:
 				System.exit(0);
 			default:
 				System.out.println("Index is out of bounds.");
@@ -57,6 +59,15 @@ public class Warehouse
 			}
 		}
 	}
+
+	private static void incomingTransport()
+	{
+		System.out.println("Insert Transport ID: ");
+		System.out.print(">> ");
+		wh.insertTransportToWarehouse(reader.nextInt());
+		System.out.println("Items Successfully Loaded To The Warehouse!");
+	}
+
 	private static void TakeItems()
 	{
 		wh.UpdateFaulty();
@@ -117,7 +128,7 @@ public class Warehouse
 	}
 	private static void ReportsMenu()
 	{
-		if(clearence!=1)
+		if(clearance !=1)
 		{
 			System.err.println("You are not authorized to produce reports.");
 			System.err.println("Log in as a warehouse administrator to do so.");

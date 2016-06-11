@@ -90,4 +90,9 @@ public class WarehouseModule implements IWarehouseModule
 		db.clearFaulty();
 	}
 
+	public void insertTransportToWarehouse(int transportID)
+	{
+		db.insertTransportToWarehouse(transportID);
+	}
+
 }
