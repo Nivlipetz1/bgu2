@@ -183,6 +183,62 @@ public class BL_IMPL implements IBL, DriverInformations {
 
     /*Driver Information functions*/
 
+    @Override
+    public HashMap<Employee, Integer> getAllAvailablesDriversAccordingToAvailablesTrucks(HashMap <Integer, String> availableTruckByTruckPlateNumAndLicenceType) { // The first element is the Available Driver, and the Second is the TruckID
+        Shift curShift = SQLDAL.getShift(LocalDate.now(), LocalTime.now());
+        HashMap<Employee, Integer> driversMap = new HashMap<Employee, Integer>();
+        Vector<Employee> driversList = new Vector<Employee>();
+        String lType;
+        boolean employeeInShift = false, employeeIsDriver = false;
+
+        if(curShift==null){
+            System.out.println("No shift exists for the day and time inserted..");
+            return null;
+        }
+
+        //get list of drivers available for this shift
+        for(Employee e : getAvailableEmployees(getShiftDay(LocalDate.now(), LocalTime.now()))) {
+
+            //check if employee is driver
+            for (Role r : e.getRoles()) {
+                if (r.getName().equals("Driver"))
+                    employeeIsDriver = true;
+            }
+
+            if (employeeIsDriver) {
+                //make sure employee not in shift
+                for (Pair p : curShift.getRoles()) {
+                    if (p.getEmployee().getId() == e.getId()) {
+                        employeeInShift = true;
+                    }
+                }
+
+                //didn't find employee in the shift, he is available
+                if (!employeeInShift) {
+                        driversList.add(e);
+                }
+
+                employeeInShift = false;
+            }
+
+            employeeIsDriver = false;
+        }
+
+        //for every license plate number:
+        for(Integer lisNum : availableTruckByTruckPlateNumAndLicenceType.keySet()){
+            for(Employee e : driversList){
+                if(((Driver)e).getLicenseType().equals(availableTruckByTruckPlateNumAndLicenceType.get(lisNum))){
+                    driversMap.put(e, lisNum); //insert emp into the hasmap
+                    driversList.remove(e); //remove emp from the drivers list
+                }
+            }
+        }
+        
+        return driversMap;
+    }
+
+
+
     /**
      * @param licenceType
      * @param time
@@ -190,12 +246,6 @@ public class BL_IMPL implements IBL, DriverInformations {
      * @return need to check if drvier with lisenceType is available based on shift availibility.
      *          if driver is availible in the shift avail and he is not scheduled for a shift then return true.
      */
-
-    @Override
-    public HashMap<Employee, Integer> getAllAvailablesDriversAccordingToAvailablesTrucks(HashMap <Integer, String> availableTruckByTruckPlateNumAndLicenceType) { // The first element is the Available Driver, and the Second is the TruckID
-        return null; //TODO
-    }
-
     @Override
     public boolean isDriverAvailable(String licenceType, LocalTime time, LocalDate date) {
         Shift curShift = SQLDAL.getShift(date, time);
