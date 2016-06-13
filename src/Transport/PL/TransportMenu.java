@@ -5,9 +5,7 @@ import Employees.BL.IBL;
 import Employees.BackEnd.Driver;
 import Employees.BackEnd.Employee;
 import Program.DriverInformations;
-import Program.OrderToTransport;
 import Transport.BL.Run;
-import Transport.BL.Truck;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -58,7 +56,28 @@ public class TransportMenu {
 		case 4:
 			mainTransport.displayMenu();
 			break;
+		case 5:
+			System.out.println("Niv tests...");
+			nivTest();
+			break;
 	}
+	}
+
+	private void nivTest(){
+		HashMap<Integer, String> availableTruckByTruckPlateNumAndLicenceType = Run.truck.getAvailableTruckByTruckPlateNumAndLicenceType();
+		HashMap<Employee, Integer> hashMapAvailablesDrivers = driverInformations.getAllAvailablesDriversAccordingToAvailablesTrucks(availableTruckByTruckPlateNumAndLicenceType);
+		if(hashMapAvailablesDrivers!=null) {
+			for (Employee e : hashMapAvailablesDrivers.keySet()) {
+				System.out.println("emp ID: "+e.getId()+ "  emp first name: " + e.getFirstName() + " can drive on truck: " + hashMapAvailablesDrivers.get(e));
+			}
+			if(hashMapAvailablesDrivers.keySet().isEmpty()){
+				System.out.println("No drivers available to drive on trucks");
+			}
+		}
+		else{
+			System.out.println("NULL");
+		}
+		mainTransport.displayMenu();
 	}
 
 	private void addIncomingTransport(){

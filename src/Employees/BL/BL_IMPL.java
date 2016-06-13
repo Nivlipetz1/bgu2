@@ -228,12 +228,13 @@ public class BL_IMPL implements IBL, DriverInformations {
         for(Integer lisNum : availableTruckByTruckPlateNumAndLicenceType.keySet()){
             for(Employee e : driversList){
                 if(((Driver)e).getLicenseType().equals(availableTruckByTruckPlateNumAndLicenceType.get(lisNum))){
-                    driversMap.put(e, lisNum); //insert emp into the hasmap
-                    driversList.remove(e); //remove emp from the drivers list
+                    if(!(driversMap.containsValue(lisNum))) { //so we don't add more than 1 employee to the same truck
+                        driversMap.put(e, lisNum); //insert emp into the hasmap
+                    }
                 }
             }
         }
-        
+
         return driversMap;
     }
 
