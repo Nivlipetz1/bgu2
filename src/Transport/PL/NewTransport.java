@@ -49,17 +49,19 @@ public class NewTransport {
         int counterOrder = 0;
         int manageItemsTransport;
         Transport.BL.Run r = new Run();
-        int transportID = Transport.BL.Run.transport.getLastTransportId();
         vectorOrderToTransportLocal =  vectorOrderToTransport;
 
 
+        System.out.println("In function addOUtcomingTransport");
         boolean driverAndTruckAvailables = fillDriverAndTruckVariables();
         if (driverAndTruckAvailables){ // we have a driver and a truck to take the transport
-
+            System.out.println("Driver and truck available");
+            int transportID = Transport.BL.Run.transport.getLastTransportId();
             numOfTrucks++;
             Run.truck.setAvailability(truckPlateNum, 1); // the Truck is not Available Anymore
 
             if (splitted){ // in case we are BACK in the function due to splitted order
+                System.out.println("We splitted the order");
                 manageItemsTransport = manageItemsTransport(transportID, orderID, truckPlateNum, itemID, amountToTakeInNextOrder, vectorOrderToTransportLocal); // fill with the remaining amount!
 
                 if (manageItemsTransport == -1) { // mean that a problem occured
@@ -91,10 +93,11 @@ public class NewTransport {
                 }
 
             }
-
+            System.out.println("We didnt slipped the order");
             if (first) en = vectorOrderToTransportLocal.elements();
 
             while (en.hasMoreElements()) { // while do we have some orders to transport
+                System.out.println("We have elements to send");
                 nextOrder = (OrderToTransport) en.nextElement();
 
                 fillItemsVariables(nextOrder);
@@ -103,7 +106,7 @@ public class NewTransport {
                     Map.Entry mentry2 = (Map.Entry) iteratorItems.next();
                     itemID = (int) mentry2.getKey();
                     amount = (int) mentry2.getValue();
-
+                    System.out.println("The items are "+itemID+" and the amount is "+amount);
                     manageItemsTransport = manageItemsTransport(transportID, orderID, truckPlateNum, itemID, amount, vectorOrderToTransportLocal);
                     if (manageItemsTransport == -1) { // mean that a problem occured
                         System.out.println("Error");
@@ -113,6 +116,7 @@ public class NewTransport {
                         return addOutcomingTransport (vectorOrderToTransportLocal);
                     }
                     else{ // else everything is OK and we already added the order to the transport in manageItemsTransport, but we have to remove the product from the HM
+                        System.out.println("We succed to enter them in tje truck");
                         itemsHashMap.remove(itemID);
                     }
                 }
@@ -120,6 +124,7 @@ public class NewTransport {
                 vectorOrderToTransportLocal.removeElementAt(0); // we are erasing the OrderToTransport in case that we will not complete the transport and then will need to complete it later
 
             }
+            System.out.println("We finished and adding a transport");
             // we add the transport to the DB
             ans = Transport.BL.Run.transport.add(transportID, truckPlateNum, driverID, source, dest, date.toString(), startTime.toString());
             if (ans) {
