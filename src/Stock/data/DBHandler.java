@@ -1202,7 +1202,7 @@ public class DBHandler implements Dbms {
 	public void makeOrders(StockReport sr)
 	{
 		for(NeededItem item : sr.readItems())
-		{			
+		{
 			Statement statement = null;
 			ResultSet resultSet = null;
 			try {
@@ -1692,7 +1692,7 @@ public class DBHandler implements Dbms {
 						continue;
 					statement = conn.createStatement();
 					if (statement.execute(
-							"SELECT Product.ID,(MaxInStock-Expected-MinInStock) FROM Product join supplier_catalouge_item ON Product.ID=supplier_catalouge_item.ID"
+							"SELECT Product.ID,(MaxInStock-Expected-MinInStock) FROM Product join supplier_catalouge_item ON Product.ID=supplier_catalouge_item.serial_number"
 									+ " join agreement_items ON agreement_items.catalouge_num=supplier_catalouge_item.catalouge_id"
 									+ " WHERE MaxInStock>(Expected+MinInStock) AND agreement_items.agreement_id="+agreementToSupplier[j][0]+" AND serial_number="+agreementToSupplier[j][1]))
 					{

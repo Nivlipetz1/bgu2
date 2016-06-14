@@ -24,7 +24,7 @@ public class Main
             System.out.println("4. Transport module.");
             System.out.println("5. Exit.");
 
-            boolean DEMO = false;
+            boolean DEMO = true;
             if(DEMO)
                 System.out.println("6. Next Day (For Demonstration only!).");
             try
