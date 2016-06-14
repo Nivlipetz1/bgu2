@@ -81,6 +81,7 @@ public class Main
     private static void dailyTasks()
     {
         Warehouse.faultyItems();
+        Warehouse.retryOrders();
         Suppliers.datedOrder();
     }
     private static int Login()

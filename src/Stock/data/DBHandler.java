@@ -1250,15 +1250,24 @@ public class DBHandler implements Dbms {
                     itemsHash.put(ID,Amount);
                     int source = ExecuteScalarQuery("SELECT ID FROM Place,supplier_cards WHERE Place.address=supplier_cards.address AND supplier_cards.serial_number="+supplier_serial_number);
                     int dest = ExecuteScalarQuery("SELECT ID FROM Place WHERE Place.address='SuperLee'");
-                    OrderToTransport ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.now(),source,dest,itemsHash);
+                    OrderToTransport ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.parse("10:00") ,source,dest,itemsHash);
                     vectorOrderToTransport.add(ott);
-                    //NewTransport.addOutcomingTransport(vectorOrderToTransport);
+                    if(!NewTransport.addOutcomingTransport(vectorOrderToTransport))
+					{
+						vectorOrderToTransport.remove(ott);
+						ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.parse("16:00") ,source,dest,itemsHash);
+						vectorOrderToTransport.add(ott);
+						if(!NewTransport.addOutcomingTransport(vectorOrderToTransport))
+						{
+							storeOrder(OrdID);
+						}
+					}
 				}
 				else
                 {
                     int i = 5;
                 }
-				
+
 				
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -1274,11 +1283,34 @@ public class DBHandler implements Dbms {
 			}
 		}
 	}
+	public void retryOrders()
+	{
+		List<Product> lst = ExecuteList("SELECT ID,Amount FROM ItemsInBackOrder",3);
+		StockReport sr = new StockReport();
+		for(Product p : lst)
+		{
+			sr.addItem(new Item(p.getID()),p.getAmount());
+		}
+		ExecuteNonQuery("DELETE FROM ItemsInBackOrder");
+		ExecuteNonQuery("DELETE FROM BackOrders");
+		makeOrders(sr);
+
+	}
+
+	private void storeOrder(int ordID)
+	{
+		try
+		{
+			execUpdateSQL("INSERT INTO BackOrders SELECT * FROM Orders WHERE OrdID="+ordID);
+			execUpdateSQL("INSERT INTO ItemsInBackOrder SELECT * FROM ItemsInOrder WHERE OID="+ordID);
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 
-
-
-    private void ExecuteNonQuery(String queryString) {
+	private void ExecuteNonQuery(String queryString) {
 		Statement statement = null;
 		try {
 			statement = conn.createStatement();
@@ -1307,6 +1339,7 @@ public class DBHandler implements Dbms {
 		ResultSet resultSet = null;
         List answer;
         switch (type){
+		case(3):
         case(0):
             answer = new LinkedList<Product>();
             break;
@@ -1478,6 +1511,7 @@ public class DBHandler implements Dbms {
 			return;
 		while (rs.next()) {
 			if (type == 0) {
+
 				Date temp = rs.getDate(2);
 				Calendar c = Calendar.getInstance();
 				if (!rs.wasNull())
@@ -1489,8 +1523,12 @@ public class DBHandler implements Dbms {
 			}
             if(type == 2)
             {
-                lst.add(new Integer(rs.getInt("OrderID")));
+                lst.add(new Integer(rs.getInt("OrdID")));
             }
+			if (type == 3) {
+				Calendar c = Calendar.getInstance();
+				lst.add(new Product(rs.getInt(1), c, rs.getInt(2)));
+			}
 		}
 	}
 	
@@ -1647,7 +1685,7 @@ public class DBHandler implements Dbms {
 				
 				for (int j = 0; j < agreementToSupplier.length; j++)
 				{
-					count = ExecuteScalarQuery("SELECT COUNT(Product.ID) FROM Product join supplier_catalouge_item ON Product.ID=supplier_catalouge_item.ID"
+					count = ExecuteScalarQuery("SELECT COUNT(Product.ID) FROM Product join supplier_catalouge_item ON Product.ID=supplier_catalouge_item.serial_number"
 									+ " join agreement_items ON agreement_items.catalouge_num=supplier_catalouge_item.catalouge_id"
 									+ " WHERE MaxInStock>(Expected+MinInStock) AND agreement_items.agreement_id="+agreementToSupplier[j][0]+" AND serial_number="+agreementToSupplier[j][1]);
 					if(count==0)

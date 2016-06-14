@@ -18,4 +18,6 @@ public interface IWarehouseModule
 	public boolean TakeItems(Product p, int amount);
 	public boolean PutItems(List<Product> toAdd);
 	public String printPendingOrders();
+
+	void retryOrders();
 }

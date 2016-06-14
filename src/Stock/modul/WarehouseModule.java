@@ -80,6 +80,12 @@ public class WarehouseModule implements IWarehouseModule
 		return db.printPendingOrders();
 	}
 
+	@Override
+	public void retryOrders()
+	{
+		db.retryOrders();
+	}
+
 	public String printFaulty()
 	{
 		return db.printFaulty();

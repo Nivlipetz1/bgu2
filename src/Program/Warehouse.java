@@ -14,6 +14,12 @@ public class Warehouse
 	public static boolean running = true;
 	private static Scanner reader = new Scanner(System.in);
 	private static WarehouseModule wh = new WarehouseModule();
+
+	public static void retryOrders()
+	{
+		wh.retryOrders();
+	}
+
 	private enum MainMenu { Reports, AddItems, TakeItems, IncomingTransport, LogOut, Quit };
 	private enum ReportsMenu { EntireStock, OneCategory, RecursiveOneCategory, PendingOrders,FaultyItems, MainMenu, Quit };
 	private static int clearance =-1;

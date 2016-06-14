@@ -48,6 +48,7 @@ public class NewTransport {
         boolean ans = false;
         int counterOrder = 0;
         int manageItemsTransport;
+        Transport.BL.Run r = new Run();
         int transportID = Transport.BL.Run.transport.getLastTransportId();
         vectorOrderToTransportLocal =  vectorOrderToTransport;
 
