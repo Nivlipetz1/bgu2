@@ -1234,14 +1234,14 @@ public class DBHandler implements Dbms {
 						execUpdateSQL("INSERT INTO Orders (SupID,SupName,SupAddress,OrderDate,Contact) "
 								+ "SELECT supplier_cards.serial_number,supplier_cards.name,supplier_cards.address,"+getNormalDate()+",email FROM supplier_cards LEFT OUTER JOIN contacts on serial_number=supplier_id"
 								+" WHERE serial_number="+supplier_serial_number);
-						
+
 						OrdID = ExecuteScalarQuery("SELECT OrdID FROM Orders WHERE SupID="+supplier_serial_number+" AND OrderDate="+getNormalDate()+"");
 					}
 					
 					
 					execUpdateSQL("INSERT INTO ItemsInOrder (OID,ID,Name,Amount,CatalogPrice,Discount,FinalPrice) VALUES"
 							+ " ("+OrdID+","+ID+",'"+Name+"',"+Amount+","+CatalogPrice+","+discount+","+finalPrice+")");
-					execUpdateSQL("UPDATE Product SET Expected=Expected+"+Amount+" WHERE ID="+ID);
+
 
 
                     Vector<OrderToTransport> vectorOrderToTransport = new Vector<OrderToTransport>();
@@ -1261,6 +1261,16 @@ public class DBHandler implements Dbms {
 						{
 							storeOrder(OrdID);
 						}
+						else
+						{
+							execUpdateSQL("UPDATE Product SET Expected=Expected+" + Amount + " WHERE ID=" + ID);
+							execUpdateSQL("UPDATE Orders SET Backed=0 WHERE OrdID="+OrdID);
+						}
+					}
+					else
+					{
+						execUpdateSQL("UPDATE Product SET Expected=Expected+" + Amount + " WHERE ID=" + ID);
+						execUpdateSQL("UPDATE Orders SET Backed=0 WHERE OrdID="+OrdID);
 					}
 				}
 				else
@@ -1285,14 +1295,14 @@ public class DBHandler implements Dbms {
 	}
 	public void retryOrders()
 	{
-		List<Product> lst = ExecuteList("SELECT ID,Amount FROM ItemsInBackOrder",3);
+		List<Product> lst = ExecuteList("SELECT ID,Amount FROM ItemsInOrder WHERE OID IN (SELECT OrdID FROM Orders WHERE Backed=1)",3);
 		StockReport sr = new StockReport();
 		for(Product p : lst)
 		{
 			sr.addItem(new Item(p.getID()),p.getAmount());
 		}
-		ExecuteNonQuery("DELETE FROM ItemsInBackOrder");
-		ExecuteNonQuery("DELETE FROM BackOrders");
+		ExecuteNonQuery("DELETE FROM ItemsInOrder WHERE OID IN (SELECT OrdID FROM Orders WHERE Backed=1)");
+		ExecuteNonQuery("DELETE FROM Orders WHERE Backed=1");
 		makeOrders(sr);
 
 	}
@@ -1301,8 +1311,8 @@ public class DBHandler implements Dbms {
 	{
 		try
 		{
-			execUpdateSQL("INSERT INTO BackOrders SELECT * FROM Orders WHERE OrdID="+ordID);
-			execUpdateSQL("INSERT INTO ItemsInBackOrder SELECT * FROM ItemsInOrder WHERE OID="+ordID);
+			execUpdateSQL("UPDATE Orders SET Backed=1 WHERE OrdID="+ordID);
+
 		} catch (SQLException e)
 		{
 			e.printStackTrace();
@@ -1700,51 +1710,57 @@ public class DBHandler implements Dbms {
 						
 						double[][] itemsToOrder = new double[count][6];
 						i=0;
+						StockReport sr = new StockReport();
 						while(resultSet.next())
 						{
+							sr.addItem(new Item(resultSet.getInt(1)),resultSet.getInt(2));
+
 							itemsToOrder[i][0]=resultSet.getInt(1);
 							itemsToOrder[i][1]=resultSet.getInt(2);
 							i++;
 						}
 						//Make the order
-						i=0;
-						String[] productNames = new String[itemsToOrder.length];
-						for(double[] product : itemsToOrder)
-						{
-							if (statement.execute("SELECT Price,discount FROM agreement_items join agreement_item_discount ON agreement_items.agreement_id=agreement_item_discount.agreement_id "
-									+ " WHERE agreement_items.agreement_id="+agreementToSupplier[j][0]))
-							{
-								resultSet = statement.getResultSet();
-								product[2]=resultSet.getInt(1);
-								product[3]=resultSet.getDouble(2);
-								product[4]=product[2]*product[3]*product[1];
-							}
-							if (statement.execute("SELECT Name From Product WHERE ID="+product[0]))
-							{
-								resultSet = statement.getResultSet();
-								productNames[i]=resultSet.getString(1);
-								i++;
-							}
-							
-						}
-						int OrdID = ExecuteScalarQuery("SELECT OrdID FROM Orders WHERE SupID="+agreementToSupplier[j][1]+" AND OrderDate="+getNormalDate()+"");
-						if(OrdID==-1)
-						{
-							//Make new order
-							execUpdateSQL("INSERT INTO Orders (SupID,SupName,SupAddress,OrderDate,Contact) "
-									+ "SELECT supplier_cards.serial_number,supplier_cards.name,supplier_cards.address,"+getNormalDate()+",email FROM supplier_cards LEFT OUTER JOIN contacts on serial_number=supplier_id"
-									+" WHERE serial_number="+agreementToSupplier[j][1]);
-							
-							OrdID = ExecuteScalarQuery("SELECT OrdID FROM Orders WHERE SupID="+agreementToSupplier[j][1]+" AND OrderDate="+getNormalDate()+"");
-						}
-						
-						for (int k = 0; k < itemsToOrder.length; k++)
-						{
-							execUpdateSQL("INSERT OR IGNORE INTO ItemsInOrder (OID,ID,Name,Amount,CatalogPrice,Discount,FinalPrice) VALUES"
-											+ " (" + OrdID + "," + itemsToOrder[k][0] + ",'" + productNames[k] + "'," + itemsToOrder[k][1] + "," + itemsToOrder[k][2]
-											+ "," + itemsToOrder[k][3] + "," + itemsToOrder[k][4] + ")");
-							execUpdateSQL("UPDATE Product SET Expected=Expected+" + itemsToOrder[k][1] + " WHERE ID=" + itemsToOrder[k][0]);
-						}
+
+						makeOrders(sr);
+
+//						i=0;
+//						String[] productNames = new String[itemsToOrder.length];
+//						for(double[] product : itemsToOrder)
+//						{
+//							if (statement.execute("SELECT Price,discount FROM agreement_items join agreement_item_discount ON agreement_items.agreement_id=agreement_item_discount.agreement_id "
+//									+ " WHERE agreement_items.agreement_id="+agreementToSupplier[j][0]))
+//							{
+//								resultSet = statement.getResultSet();
+//								product[2]=resultSet.getInt(1);
+//								product[3]=resultSet.getDouble(2);
+//								product[4]=product[2]*product[3]*product[1];
+//							}
+//							if (statement.execute("SELECT Name From Product WHERE ID="+product[0]))
+//							{
+//								resultSet = statement.getResultSet();
+//								productNames[i]=resultSet.getString(1);
+//								i++;
+//							}
+//
+//						}
+//						int OrdID = ExecuteScalarQuery("SELECT OrdID FROM Orders WHERE SupID="+agreementToSupplier[j][1]+" AND OrderDate="+getNormalDate()+"");
+//						if(OrdID==-1)
+//						{
+//							//Make new order
+//							execUpdateSQL("INSERT INTO Orders (SupID,SupName,SupAddress,OrderDate,Contact) "
+//									+ "SELECT supplier_cards.serial_number,supplier_cards.name,supplier_cards.address,"+getNormalDate()+",email FROM supplier_cards LEFT OUTER JOIN contacts on serial_number=supplier_id"
+//									+" WHERE serial_number="+agreementToSupplier[j][1]);
+//
+//							OrdID = ExecuteScalarQuery("SELECT OrdID FROM Orders WHERE SupID="+agreementToSupplier[j][1]+" AND OrderDate="+getNormalDate()+"");
+//						}
+//
+//						for (int k = 0; k < itemsToOrder.length; k++)
+//						{
+//							execUpdateSQL("INSERT OR IGNORE INTO ItemsInOrder (OID,ID,Name,Amount,CatalogPrice,Discount,FinalPrice) VALUES"
+//											+ " (" + OrdID + "," + itemsToOrder[k][0] + ",'" + productNames[k] + "'," + itemsToOrder[k][1] + "," + itemsToOrder[k][2]
+//											+ "," + itemsToOrder[k][3] + "," + itemsToOrder[k][4] + ")");
+//							execUpdateSQL("UPDATE Product SET Expected=Expected+" + itemsToOrder[k][1] + " WHERE ID=" + itemsToOrder[k][0]);
+//						}
 					}
 				}
 			}
