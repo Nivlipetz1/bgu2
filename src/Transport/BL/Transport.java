@@ -19,10 +19,14 @@ public class Transport {
 
 	public int getLastTransportId(){
 		int ans=-2;
+		Statement st = null;
+		ResultSet rs = null;
 		try {
-			Statement st=db.createStatement();
+			st=db.createStatement();
 			String sql="SELECT ID FROM Transport";
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
+			if(rs.wasNull())
+				return 1;
 			while (rs.next()){
 				ans = rs.getInt("ID");
 			}
@@ -30,7 +34,20 @@ public class Transport {
 			st.close();
 		} catch (SQLException e) {
 			ans=0;
+		}finally
+		{
+			try
+			{
+				rs.close();
+			}catch (Exception e1){}
+			try
+			{
+				st.close();
+			}catch (Exception e1){}
+
 		}
+
+
 		return ans+1;
 	}
 	

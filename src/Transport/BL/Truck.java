@@ -126,10 +126,12 @@ public class Truck {
 		int maxTruckWeight;
 		int itemWeight=0;
 		int allWeight = 0;
+		Statement st = null;
+		ResultSet rs = null;
 		try {
-			Statement st=db.createStatement();
+			st=db.createStatement();
 			String sql="SELECT ActualWeight,MaxWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			
 			itemWeight = Run.item.getItemWeight(itemID);
 			allWeight = itemWeight * amount;
@@ -142,6 +144,20 @@ public class Truck {
 
 		} catch (SQLException e) {
 			ans = false;
+		}
+		finally
+		{
+			try{
+				rs.close();
+			}catch (Exception e1){
+
+			}
+			try
+			{
+				st.close();
+			}catch (Exception e2){
+
+			}
 		}
 		return ans;
 	}
@@ -187,6 +203,42 @@ public class Truck {
 		} catch (SQLException e) {
 		}
 	}
+	public int truckCapacity (int truckPlateNum){
+		int actualTruckWeight;
+		int maxTruckWeight;
+		int weightAllowed = 0;
+		Statement st = null;
+		ResultSet rs = null;
+		try {
+			st=db.createStatement();
+			String sql="SELECT ActualWeight,MaxWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
+			rs = st.executeQuery(sql);
+
+			actualTruckWeight = rs.getInt("ActualWeight");
+			maxTruckWeight = rs.getInt("MaxWeight");
+			weightAllowed = maxTruckWeight - actualTruckWeight;
+
+
+			rs.close();
+			st.close();
+
+		} catch (SQLException e) {
+		}
+		finally
+		{
+			try
+			{
+				rs.close();
+			}catch (Exception e1){}
+			try
+			{
+				st.close();
+			}catch (Exception e1){}
+
+		}
+
+		return weightAllowed;
+	}
 
 	public boolean addWeight (int truckPlateNum, int itemID, int amount){
 		boolean ans = true;
@@ -194,10 +246,14 @@ public class Truck {
 		int itemWeight=0;
 		int allWeight = 0;
 		int newWeight=0;
+		Statement st = null;
+		Statement st2 = null;
+		ResultSet rs = null;
+		PreparedStatement pstmt = null;
 		try {
-			Statement st=db.createStatement();
+			st=db.createStatement();
 			String sql="SELECT ActualWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			
 			itemWeight = Run.item.getItemWeight(itemID);
 			allWeight = itemWeight * amount;
@@ -209,9 +265,9 @@ public class Truck {
 			//System.out.println("New weight= "+newWeight);
 
 
-			Statement st2=db.createStatement();
+			st2=db.createStatement();
 			String sql2="UPDATE Truck SET ActualWeight = "+newWeight +" WHERE TruckPlateNum = "+truckPlateNum+";";
-			PreparedStatement pstmt = db.prepareStatement(sql2);
+			pstmt = db.prepareStatement(sql2);
 			pstmt.executeUpdate();
 
 			ans = true;
@@ -223,16 +279,42 @@ public class Truck {
 		} catch (SQLException e) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 			ans = false;
+		}finally
+		{
+			try{
+			rs.close();
+		}catch (Exception e1){
+
+		}
+			try{
+				st.close();
+			}catch (Exception e1){
+
+			}
+			try
+			{
+				st2.close();
+			}catch (Exception e2){
+
+			}
+			try
+			{
+				pstmt.close();
+			}catch (Exception e2){
+
+			}
 		}
 		return ans;
 	}
 
 	public String getLicenceType (int truckPlateNum){
 		String ans="";
+		Statement st = null;
+		ResultSet rs = null;
 		try {
-			Statement st=db.createStatement();
+			st=db.createStatement();
 			String sql="SELECT LicenceType FROM Truck WHERE truckPlateNum = "+truckPlateNum+";";
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 
 			ans = rs.getString("licenceType");
 			rs.close();
@@ -240,6 +322,19 @@ public class Truck {
 
 		} catch (SQLException e) {
 		}
+		finally
+		{
+			try
+			{
+				rs.close();
+			}catch (Exception e1){}
+			try
+			{
+				st.close();
+			}catch (Exception e1){}
+
+		}
+
 		return ans;
 	}
 
@@ -262,10 +357,12 @@ public class Truck {
 
 	public Vector <Integer> getAvailablesTruck (){
 		Vector<Integer> ans= new Vector<Integer>();
+		Statement st = null;
+		ResultSet rs = null;
 		try {
-			Statement st=db.createStatement();
+			st=db.createStatement();
 			String sql="SELECT TruckPlateNum FROM Truck WHERE Available=0;";
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			while (rs.next()){
 				ans.add(rs.getInt("TruckPlateNum"));
 			}
@@ -274,6 +371,19 @@ public class Truck {
 
 		} catch (SQLException e) {
 		}
+		finally
+		{
+			try
+			{
+				rs.close();
+			}catch (Exception e1){}
+			try
+			{
+				st.close();
+			}catch (Exception e1){}
+
+		}
+
 		return ans;
 	}
 
@@ -327,15 +437,31 @@ public class Truck {
 	}
 
 	public  void setAvailability (int truckPlateNum, int available){ // 0 available, 1 not available
+		Statement st2 = null;
+		PreparedStatement pstmt = null;
 		try {
-			Statement st2=db.createStatement();
+			st2=db.createStatement();
 			String sql2="UPDATE Truck SET Available = "+available +" WHERE TruckPlateNum = "+truckPlateNum+";";
-			PreparedStatement pstmt = db.prepareStatement(sql2);
+			pstmt = db.prepareStatement(sql2);
 			pstmt.executeUpdate();
 			st2.close();
 
 		} catch (SQLException e) {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+		finally
+		{
+			try {
+
+				st2.close();
+
+			} catch (SQLException e) {}
+			try {
+
+				pstmt.close();
+
+			} catch (SQLException e) {}
+
 		}
 	}
 

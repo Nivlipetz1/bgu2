@@ -1,5 +1,7 @@
 package Program;
 
+import Stock.modul.NeededItem;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -13,15 +15,16 @@ public class OrderToTransport {
     private LocalTime startTime;
     private int sourceId; // the source adress of the transport
     private int destId;
-    private HashMap<Integer, Integer> itemsHashMap = new HashMap <Integer, Integer>(); // hashMap of items, when the first Integer is ItemID, and the second is the amount of it
+    private NeededItem needed;
 
-    public OrderToTransport(int orderID, LocalDate date, LocalTime startTime, int sourceId, int destID, HashMap<Integer, Integer> itemsHashMap) {
+    public OrderToTransport(int orderID, LocalDate date, LocalTime startTime, int sourceId, int destID, NeededItem needed) {
         this.orderID = orderID;
         this.date = date;
         this.startTime = startTime;
         this.sourceId = sourceId;
         this.destId = destID;
-        this.itemsHashMap = itemsHashMap;
+        this.needed = needed;
+
     }
 
     public int getOrderID() {
@@ -44,7 +47,18 @@ public class OrderToTransport {
         return destId;
     }
 
-    public HashMap<Integer, Integer> getItemsHashMap() {
-        return itemsHashMap;
+    public int getItemID()
+    {
+        return needed.getItem().getID();
+    }
+
+    public int getItemAmount()
+    {
+        return needed.getQuantity();
+    }
+
+    public void subtractAmount(int handled)
+    {
+        this.needed.setAmount(this.needed.getQuantity()-handled);
     }
 }

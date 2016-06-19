@@ -1,6 +1,7 @@
 package Employees.DAL;
 import Employees.BackEnd.*;
 import Employees.BackEnd.Driver;
+import org.junit.runner.Result;
 import org.sqlite.SQLiteDataSource;
 
 import java.sql.*;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.Exchanger;
 
 public class SQLiteDAL implements IDAL{
 
@@ -56,17 +58,21 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-
+            try{
+                stat.close();
+            }catch (Exception e2){}
             return false;
         }
     }
 
     @Override
     public boolean insertRole(Role role) {
+
+        PreparedStatement preStat = null;
         try{
             String sql = "INSERT INTO Roles " +
                     "VALUES (?,?,?)";
-            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat = db.prepareStatement(sql);
             preStat.setInt(1,role.getID());
             preStat.setString(2,role.getName());
             preStat.setInt(3,0);
@@ -75,7 +81,9 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-
+            try{
+                preStat.close();
+            }catch (Exception e2){}
             return false;
         }
     }
@@ -92,7 +100,9 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-
+            try{
+                stat.close();
+            }catch (Exception e2){}
             return false;
         }
     }
@@ -109,7 +119,9 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
-
+            try{
+                stat.close();
+            }catch (Exception e2){}
             return false;
         }
     }
@@ -140,7 +152,9 @@ public class SQLiteDAL implements IDAL{
             return new Day(morningShift,eveningShift,d);
         }
         catch(SQLException e){
-            //
+            try{
+                set.close();
+            }catch (Exception e2){}
             return null;
         }
 
@@ -148,9 +162,10 @@ public class SQLiteDAL implements IDAL{
 
     @Override
     public boolean insert(Day day) {
+        PreparedStatement preStat = null;
         try{
             String sql = "INSERT INTO Days VALUES (?,?,?,?)";
-            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat = db.prepareStatement(sql);
             preStat.setString(1,day.getDate());
             if(day.getMorningShift()!=null){
                 preStat.setInt(2, day.getMorningShift().getID());
@@ -172,6 +187,9 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch (SQLException e){
+            try{
+                preStat.close();
+            }catch (Exception e2){}
             return false;
         }
     }
@@ -185,17 +203,21 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch (SQLException e){
+            try{
+                stat.close();
+            }catch (Exception e2){}
             return false;
         }
     }
 
     @Override
     public boolean update(Day day) {
+        PreparedStatement preStat = null;
         try {
             String sql = "UPDATE Days " +
                     "SET MorningShift=?, EveningShift=? " +
                     "WHERE Date='"+day.getDate()+"'";
-            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat = db.prepareStatement(sql);
             preStat.setInt(1,day.getMorningShift().getID());
             preStat.setInt(2,day.getEveningShift().getID());
             int rows = preStat.executeUpdate();
@@ -203,6 +225,10 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch (SQLException e){
+            try{
+                preStat.close();
+            }catch (Exception e2){}
+
             return false;
         }
     }
@@ -257,14 +283,21 @@ public class SQLiteDAL implements IDAL{
             return new Shift(id,startTime,endTime,duration,date,manager,roles, map);
         }
         catch (SQLException e){
+            try{
+                set.close();
+            }catch (Exception e2){}
+            try{
+                stat.close();
+            }catch (Exception e2){}
             return null;
         }
     }
 
     private HashMap<Integer,Integer> getRolesOfShift(int id){
         HashMap<Integer,Integer> map = new HashMap<>();
+        ResultSet set = null;
         try {
-            ResultSet set = stat.executeQuery("SELECT * FROM RolesOfShifts WHERE ShiftID=" + id);
+            set = stat.executeQuery("SELECT * FROM RolesOfShifts WHERE ShiftID=" + id);
             while(set.next()){
                 map.put(set.getInt("RoleID"),set.getInt("Amount"));
             }
@@ -273,6 +306,12 @@ public class SQLiteDAL implements IDAL{
             return map;
         }
         catch (SQLException e){
+            try{
+                set.close();
+            }catch (Exception e2){}
+            try{
+                stat.close();
+            }catch (Exception e3){}
             return map;
         }
     }
@@ -280,8 +319,9 @@ public class SQLiteDAL implements IDAL{
     private Vector<Pair> getEmployeesOfShift(int id){
         HashMap<Integer,Integer> map = new HashMap<>();
         Vector<Pair> vec = new Vector<>();
+        ResultSet set = null;
         try {
-            ResultSet set = stat.executeQuery("SELECT * FROM EmployeesInShifts WHERE ShiftID=" + id);
+            set = stat.executeQuery("SELECT * FROM EmployeesInShifts WHERE ShiftID=" + id);
             while(set.next()){
                 map.put(set.getInt("EmployeeID"),set.getInt("RoleID"));
             }
@@ -298,44 +338,72 @@ public class SQLiteDAL implements IDAL{
             }
         }
         catch (SQLException e){
-
+            try{
+                set.close();
+            }catch (Exception e2){}
+            try{
+                stat.close();
+            }catch (Exception e2){}
         }
         return vec;
     }
 
     private void insertRolesOfShifts(Shift shift) throws SQLException{
         String sql = "INSERT INTO RolesOfShifts VALUES (?,?,?)";
-        PreparedStatement preStat = db.prepareStatement(sql);
-        for(Pair p: shift.getRoles()){
-            if(!(roleExists(shift.getID(),p.getRole(),"RolesOfShifts","ShiftID"))){
-                preStat.setInt(1,p.getRole().getID());
-                preStat.setInt(2,shift.getID());
-                preStat.setInt(3,shift.getAmountOfRoles().get(p.getRole().getID()));
-                preStat.executeUpdate();
-                preStat.clearParameters();
+        PreparedStatement preStat = null;
+        try
+        {
+            db.prepareStatement(sql);
+            for (Pair p : shift.getRoles())
+            {
+                if (!(roleExists(shift.getID(), p.getRole(), "RolesOfShifts", "ShiftID")))
+                {
+                    preStat.setInt(1, p.getRole().getID());
+                    preStat.setInt(2, shift.getID());
+                    preStat.setInt(3, shift.getAmountOfRoles().get(p.getRole().getID()));
+                    preStat.executeUpdate();
+                    preStat.clearParameters();
+                }
             }
+            preStat.close();
         }
-        preStat.close();
+        catch (Exception e1){
+            try{
+                preStat.close();
+            }catch (Exception e2){}
+        }
     }
-    private void insertEmployeesOfShifts(Shift shift) throws SQLException{
-        String sql = "INSERT INTO EmployeesInShifts VALUES (?,?,?)";
-        PreparedStatement preStat = db.prepareStatement(sql);
-        for(Pair p: shift.getRoles()){
-            if(p.getEmployee()!=null){
-                preStat.setInt(2,shift.getID());
-                preStat.setInt(1,p.getEmployee().getId());
-                preStat.setInt(3,p.getRole().getID());
-                preStat.executeUpdate();
-                preStat.clearParameters();
+    private void insertEmployeesOfShifts(Shift shift){
+        PreparedStatement preStat = null;
+        try
+        {
+            String sql = "INSERT INTO EmployeesInShifts VALUES (?,?,?)";
+
+            preStat = db.prepareStatement(sql);
+            for (Pair p : shift.getRoles())
+            {
+                if (p.getEmployee() != null)
+                {
+                    preStat.setInt(2, shift.getID());
+                    preStat.setInt(1, p.getEmployee().getId());
+                    preStat.setInt(3, p.getRole().getID());
+                    preStat.executeUpdate();
+                    preStat.clearParameters();
+                }
             }
+            preStat.close();
+        }catch(Exception e1){
+            try{
+                preStat.close();
+            }catch (Exception e2){}
         }
-        preStat.close();
     }
     @Override
     public boolean insert(Shift shift) {
+        PreparedStatement preStat = null;
         try {
             String sql = "INSERT INTO Shifts VALUES (?,?,?,?,?,?,?)";
-            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat = db.prepareStatement(sql);
             preStat.setInt(1, shift.getID());
             preStat.setString(2, shift.getStartTime());
             preStat.setString(3, shift.getEndTime());
@@ -350,6 +418,11 @@ public class SQLiteDAL implements IDAL{
             return true;
         }
         catch (SQLException e){
+
+            try
+            {
+                preStat.close();
+            }catch (Exception e1){}
             return false;
         }
     }
@@ -374,8 +447,9 @@ public class SQLiteDAL implements IDAL{
         String sql = "UPDATE Shifts " +
                 "SET Date=? , Duration=? , EndTime= ? , StartTime=?, ManagerID=?" +
                 "WHERE ID=?";
+        PreparedStatement preStat = null;
         try {
-            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat = db.prepareStatement(sql);
             preStat.setInt(6, shift.getID());
             preStat.setString(4, shift.getStartTime());
             preStat.setString(3, shift.getEndTime());
@@ -396,8 +470,18 @@ public class SQLiteDAL implements IDAL{
             return true;
         }
         catch(SQLException e){
+            try
+            {
+                stat.close();
+            }catch (Exception e1){}
+            try
+            {
+                preStat.close();
+            }catch (Exception e1){}
+
             return false;
         }
+
     }
 
 
@@ -415,8 +499,9 @@ public class SQLiteDAL implements IDAL{
 */
     @Override
     public Employee getEmployee(int id) {
+        ResultSet set = null;
         try{
-            ResultSet set = getListByID("Employees","ID",Integer.toString(id));
+            set = getListByID("Employees","ID",Integer.toString(id));
             String firstName = set.getString("FirstName");
             String lastName = set.getString("LastName");
             String contract = set.getString("Contract");
@@ -446,15 +531,26 @@ public class SQLiteDAL implements IDAL{
             }
         }
         catch (SQLException e){
+            try{
+                set.close();
+            }catch (Exception e1){
 
+            }
+            try
+            {
+                stat.close();
+            }catch (Exception e2){
+
+            }
         }
         return null;
     }
 
     private int[][] getAvailability(int id){
         int[][] array = new int[2][7];
+        ResultSet set = null;
         try {
-            ResultSet set = getListByID("EmployeeAvailability", "EmployeeID", Integer.toString(id));
+            set = getListByID("EmployeeAvailability", "EmployeeID", Integer.toString(id));
             set.next();
             for(int i=0;i<7;i++){
                 for(int j=0;j<2;j++){
@@ -465,15 +561,24 @@ public class SQLiteDAL implements IDAL{
             stat.close();
         }
         catch (SQLException e){
+            try{
+                set.close();
+            }catch (Exception e2){
 
+            }try{
+                stat.close();
+            }catch (Exception e2){
+
+            }
         }
         return array;
     }
 
     private boolean insertDriver(Driver driver){
+        PreparedStatement preStat = null;
         try{
             String sql = "INSERT INTO Driver VALUES (?,?,?)";
-            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat = db.prepareStatement(sql);
             preStat.setInt(1,driver.getId());
             preStat.setInt(2,Integer.parseInt(driver.getLicenseNumber()));
             preStat.setString(3,driver.getLicenseType());
@@ -482,7 +587,11 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
+            try{
+                preStat.close();
+            }catch (Exception e2){
 
+            }
             return false;
         }
     }
@@ -497,17 +606,22 @@ public class SQLiteDAL implements IDAL{
             return rows>0;
         }
         catch(Exception e){
+            try{
+                stat.close();
+            }catch (Exception e2){
 
+            }
             return false;
         }
     }
 
     private boolean updateDriver(Driver driver){
+        PreparedStatement stat = null;
         try{
             String sql = "UPDATE Driver " +
                     "Set LicenceNum=?, LicenceType=? " +
                     "Where ID=?";
-            PreparedStatement stat = db.prepareStatement(sql);
+            stat = db.prepareStatement(sql);
             stat.setInt(1,Integer.parseInt(driver.getLicenseNumber()));
             stat.setString(2,driver.getLicenseType());
             stat.setInt(3,driver.getId());
@@ -516,7 +630,11 @@ public class SQLiteDAL implements IDAL{
             return rows==1;
         }
         catch(Exception e){
+            try{
+                stat.close();
+            }catch (Exception e2){
 
+            }
             return false;
         }
     }
@@ -526,8 +644,9 @@ public class SQLiteDAL implements IDAL{
     private Vector<Role> getEmployeeRoles(int id){
         Vector<Role> vec = new Vector<>();
         Vector<Integer> roleIDs = new Vector<>();
+        ResultSet set = null;
         try {
-            ResultSet set = stat.executeQuery("SELECT * FROM RolesOfEmployees WHERE EmployeeID=" + id);
+            set = stat.executeQuery("SELECT * FROM RolesOfEmployees WHERE EmployeeID=" + id);
             while (set.next()) {
                 roleIDs.add(set.getInt("RoleID"));
             }
@@ -540,16 +659,26 @@ public class SQLiteDAL implements IDAL{
             }
         }
         catch (SQLException e){
+            try{
+                set.close();
+            }catch (Exception e2){
 
+            }
+            try{
+                stat.close();
+            }catch (Exception e2){
+
+            }
         }
         return vec;
     }
 
     @Override
     public Role getRole(int id) {
+        ResultSet set = null;
         try{
             Role role = null;
-            ResultSet set = getListByID("Roles","ID",Integer.toString(id));
+            set = getListByID("Roles","ID",Integer.toString(id));
             if (set.getInt("Deleted")==0)
                 role = new Role(set.getInt("ID"),set.getString("Name"));
             set.close();
@@ -557,6 +686,16 @@ public class SQLiteDAL implements IDAL{
             return role;
         }
         catch (SQLException e){
+            try
+            {
+                set.close();
+            }catch (Exception e1)
+            {}
+            try
+            {
+                stat.close();
+            }catch (Exception e1)
+            {}
             return null;
         }
     }
@@ -564,10 +703,12 @@ public class SQLiteDAL implements IDAL{
 
     @Override
     public boolean insert(Employee emp) {
+        PreparedStatement preStat = null;
+
         try {
             //insert new emp
             String sql = "INSERT INTO Employees VALUES (?,?,?,?,?,?,?)";
-            PreparedStatement preStat = db.prepareStatement(sql);
+            preStat = db.prepareStatement(sql);
             preStat.setInt(1,emp.getId());
             preStat.setString(2,emp.getFirstName());
             preStat.setString(3,emp.getLastName());
@@ -588,15 +729,25 @@ public class SQLiteDAL implements IDAL{
         catch(Exception e){
             System.out.print("insert employee");
             System.out.print(e);
+
+            try
+            {
+                preStat.close();
+            } catch (Exception e1)
+            {
+            }
             return false;
         }
         return true;
+
     }
 
     private boolean employeeAvailability(Employee emp){
+        PreparedStatement preparedStatement = null;
+        int rows = 0;
         try {
             String sql = "INSERT INTO EmployeeAvailability VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ;";
-            PreparedStatement preparedStatement =
+            preparedStatement =
                     db.prepareStatement(sql);
             preparedStatement.setInt(1, emp.getId());
             int counter=2;
@@ -607,14 +758,19 @@ public class SQLiteDAL implements IDAL{
                 }
             }
             preparedStatement.setInt(16,0);//Deleted attribute
-            int rows = preparedStatement.executeUpdate();
+            rows = preparedStatement.executeUpdate();
             preparedStatement.close();
             return rows==1;
         }
         catch (SQLException e){
-
+            try
+            {
+                preparedStatement.close();
+            }catch (Exception e1){}
             return false;
         }
+
+
     }
 
     @Override
@@ -632,6 +788,12 @@ public class SQLiteDAL implements IDAL{
             return rows>0;
 
         }catch (Exception e){
+
+            try{
+                stat.close();
+            }catch (Exception e1){
+
+            }
             return false;
         }
     }
@@ -641,8 +803,10 @@ public class SQLiteDAL implements IDAL{
         String sql = "UPDATE Employees " +
                 "SET FirstName=? , LastName=? , Contract = ? , DateOfHire = ? , BankAccount = ?" +
                 "WHERE ID=?";
+        PreparedStatement preparedStatement = null;
+        int rowsAffected = 0;
         try{
-            PreparedStatement preparedStatement =
+            preparedStatement =
                     db.prepareStatement(sql);
 
             preparedStatement.setString(1, emp.getFirstName());
@@ -652,7 +816,7 @@ public class SQLiteDAL implements IDAL{
             preparedStatement.setString(5, emp.getBankAcct());
             preparedStatement.setInt(6, emp.getId());
 
-            int rowsAffected = preparedStatement.executeUpdate();
+            rowsAffected = preparedStatement.executeUpdate();
             preparedStatement.close();
             stat = db.createStatement();
             stat.executeUpdate("DELETE FROM EmployeeAvailability WHERE EmployeeID = "+emp.getId());
@@ -673,8 +837,18 @@ public class SQLiteDAL implements IDAL{
 
         } catch(SQLException e){
 
-            return false;
+
+            try
+            {
+                stat.close();
+            }catch (Exception e1){}
+            try
+            {
+                preparedStatement.close();
+            }catch (Exception e1){}
         }
+
+        return false;
 
     }
 
@@ -685,18 +859,34 @@ public class SQLiteDAL implements IDAL{
 ////////////// END OF EMPLOYEE FUNCTIONS
 */
 
-    private boolean roleExists(int ID,Role role,String table,String attribute) throws SQLException{
+    private boolean roleExists(int ID,Role role,String table,String attribute){
+        PreparedStatement preStat = null;
+        ResultSet set = null;
+        int count = 0;
+        try
+        {
+            String sql = "SELECT COUNT(*) FROM " + table +
+                    " WHERE " + attribute + "=? AND RoleID=?";
+            preStat = db.prepareStatement(sql);
+            preStat.setInt(1, ID);
+            preStat.setInt(2, role.getID());
+            set = preStat.executeQuery();
+            count = set.getInt(1);
+            set.close();
+            preStat.close();
+            return count > 0;
+        }catch (Exception e){
 
-        String sql = "SELECT COUNT(*) FROM "+table+
-                " WHERE "+attribute+"=? AND RoleID=?";
-        PreparedStatement preStat = db.prepareStatement(sql);
-        preStat.setInt(1,ID);
-        preStat.setInt(2,role.getID());
-        ResultSet set = preStat.executeQuery();
-        int count = set.getInt(1);
-        set.close();
-        preStat.close();
-        return count>0;
+            try
+            {
+                set.close();
+            }catch (Exception e1){}
+            try
+            {
+                preStat.close();
+            }catch (Exception e1){}
+            return count > 0;
+        }
     }
 
 
@@ -706,16 +896,25 @@ public class SQLiteDAL implements IDAL{
      * @return the Role id or -1 if there was an error
      */
     public int roleID(){
+        ResultSet set = null;
         try {
             stat = db.createStatement();
             String sql = "SELECT COUNT(*) FROM Roles";
-            ResultSet set = stat.executeQuery(sql);
+            set = stat.executeQuery(sql);
             int count = set.getInt(1);
             set.close();
             stat.close();
             return count+1;
         }catch (SQLException e){
 
+            try
+            {
+                set.close();
+            }catch (Exception e1){}
+            try
+            {
+                stat.close();
+            }catch (Exception e1){}
             return -1;
         }
     }
@@ -727,9 +926,10 @@ public class SQLiteDAL implements IDAL{
     }
     public Vector<Role> getRoles(){
         Vector<Role> list = new Vector<Role>();
+        ResultSet set = null;
         try {
 
-            ResultSet set = getListByID("Roles", null, null);
+            set = getListByID("Roles", null, null);
             while(set.next()){
                 if(set.getInt("Deleted")==0) {
                     Role role = new Role(set.getInt(1), set.getString(2));
@@ -743,6 +943,15 @@ public class SQLiteDAL implements IDAL{
         }
         catch (SQLException e){
 
+            try
+            {
+                set.close();
+            }catch (Exception e1){}
+            try
+            {
+                stat.close();
+            }catch (Exception e1){}
+
         }
         return list;
     }
@@ -751,8 +960,9 @@ public class SQLiteDAL implements IDAL{
     public Vector<Employee> getEmployees() {
         Vector<Employee> employees = new Vector<>();
         Vector<Integer> ids = new Vector<>();
+        ResultSet set = null;
         try{
-            ResultSet set = getListByID("Employees",null,null);
+            set = getListByID("Employees",null,null);
             while(set.next()){
                 ids.add(set.getInt("ID"));
             }
@@ -764,7 +974,18 @@ public class SQLiteDAL implements IDAL{
 
         } catch (SQLException e){
 
+
+            try
+            {
+                set.close();
+            }catch (Exception e1){}
+            try
+            {
+                stat.close();
+            }catch (Exception e1){}
+
         }
+
         return employees;
 
     }
@@ -795,9 +1016,10 @@ public class SQLiteDAL implements IDAL{
         Vector<Employee> employees = new Vector<>();
 
         String attribute = days[avail[0][0]][avail[0][1]];
+        ResultSet set = null;
         try {
             stat = db.createStatement();
-            ResultSet set = stat.executeQuery("SELECT EmployeeID FROM EmployeeAvailability " +
+            set = stat.executeQuery("SELECT EmployeeID FROM EmployeeAvailability " +
                     "WHERE "+attribute+"=1");
             Vector<Integer> ids = new Vector<>();
             while (set.next()){
@@ -813,15 +1035,26 @@ public class SQLiteDAL implements IDAL{
         }
         catch (SQLException e){
 
+
+            try
+            {
+                set.close();
+            }catch (Exception e1){}
+            try
+            {
+                stat.close();
+            }catch (Exception e1){}
+
         }
         return employees;
     }
 
     @Override
     public Shift getShift(LocalDate d, LocalTime time) {
+        ResultSet set = null;
         try{
             stat = db.createStatement();
-            ResultSet set = stat.executeQuery("SELECT * FROM Shifts " +
+            set = stat.executeQuery("SELECT * FROM Shifts " +
                     "WHERE Date='"+d.format(formatterDate)+"' ");
             int id = -1;
             while(set.next()){
@@ -838,7 +1071,17 @@ public class SQLiteDAL implements IDAL{
         }
         catch (SQLException e){
 
+
+            try
+            {
+                set.close();
+            }catch (Exception e1){}
+            try
+            {
+                stat.close();
+            }catch (Exception e1){}
             return null;
+
         }
     }
 
@@ -866,18 +1109,30 @@ public class SQLiteDAL implements IDAL{
     }
 
     public boolean isDriver(int id){
+        ResultSet set = null;
         try{
             stat = db.createStatement();
             String sql = "SELECT * FROM Driver WHERE ID="+id;
-            ResultSet set = stat.executeQuery(sql);
+            set = stat.executeQuery(sql);
             boolean ans = set.next();
             set.close();
             stat.close();
             return ans;
         }
         catch (SQLException e){
+
+            try
+            {
+                set.close();
+            }catch (Exception e1){}
+            try
+            {
+                stat.close();
+            }catch (Exception e1){}
             return false;
+
         }
+
     }
 
 }

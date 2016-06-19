@@ -14,4 +14,9 @@ public class NeededItem {
 		this.item = item;
 		this.quantity = quantity;
 	}
+
+	public void setAmount(int amount)
+	{
+		this.quantity = amount;
+	}
 }

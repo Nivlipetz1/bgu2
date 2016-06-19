@@ -1238,26 +1238,20 @@ public class DBHandler implements Dbms {
 						OrdID = ExecuteScalarQuery("SELECT OrdID FROM Orders WHERE SupID="+supplier_serial_number+" AND OrderDate="+getNormalDate()+"");
 					}
 					
-					
-					execUpdateSQL("INSERT INTO ItemsInOrder (OID,ID,Name,Amount,CatalogPrice,Discount,FinalPrice) VALUES"
+					resultSet.close();
+					execUpdateSQL("INSERT OR IGNORE INTO ItemsInOrder (OID,ID,Name,Amount,CatalogPrice,Discount,FinalPrice) VALUES"
 							+ " ("+OrdID+","+ID+",'"+Name+"',"+Amount+","+CatalogPrice+","+discount+","+finalPrice+")");
 
 
 
-                    Vector<OrderToTransport> vectorOrderToTransport = new Vector<OrderToTransport>();
 
-                    HashMap<Integer,Integer> itemsHash = new HashMap<Integer, Integer>();
-                    itemsHash.put(ID,Amount);
                     int source = ExecuteScalarQuery("SELECT ID FROM Place,supplier_cards WHERE Place.address=supplier_cards.address AND supplier_cards.serial_number="+supplier_serial_number);
                     int dest = ExecuteScalarQuery("SELECT ID FROM Place WHERE Place.address='SuperLee'");
-                    OrderToTransport ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.parse("10:00") ,source,dest,itemsHash);
-                    vectorOrderToTransport.add(ott);
-                    if(!NewTransport.addOutcomingTransport(vectorOrderToTransport))
+                    OrderToTransport ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.parse("10:00") ,source,dest,new NeededItem(new Item(ID),Amount));
+                    if(!NewTransport.addOutcomingTransport(ott))
 					{
-						vectorOrderToTransport.remove(ott);
-						ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.parse("16:00") ,source,dest,itemsHash);
-						vectorOrderToTransport.add(ott);
-						if(!NewTransport.addOutcomingTransport(vectorOrderToTransport))
+						ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.parse("16:00") ,source,dest,new NeededItem(new Item(ID),Amount));
+						if(!NewTransport.addOutcomingTransport(ott))
 						{
 							storeOrder(OrdID);
 						}
