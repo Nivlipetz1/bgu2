@@ -1350,6 +1350,7 @@ public class DBHandler implements Dbms {
         case(1):
             answer = new LinkedList<Category>();
             break;
+		case(4):
         case(2):
             answer = new LinkedList<Integer>();
             break;
@@ -1532,6 +1533,10 @@ public class DBHandler implements Dbms {
 			if (type == 3) {
 				Calendar c = Calendar.getInstance();
 				lst.add(new Product(rs.getInt(1), c, rs.getInt(2)));
+			}
+			if(type == 4)
+			{
+				lst.add(new Integer(rs.getInt("OrdID")));
 			}
 		}
 	}
@@ -1752,7 +1757,7 @@ public class DBHandler implements Dbms {
         List<Integer> orderIDs;
         Statement statement = null;
         ResultSet resultSet = null;
-        orderIDs = ExecuteList("SELECT OrdID FROM Orders",2);
+        orderIDs = ExecuteList("SELECT OrdID FROM Orders",4);
         if(orderIDs == null)
             return "There are no pending orders!";
         for(Integer i : orderIDs)

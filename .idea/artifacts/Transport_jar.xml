@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Transport:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/Transport_jar</output-path>
+    <root id="archive" name="Transport.jar">
+      <element id="module-output" name="Transport" />
+      <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/lib/junit-4.12.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/sqlite-jdbc-3.8.11.2.jar" path-in-jar="/" />
+      <element id="library" level="module" name="sqlite-jdbc-3.8.11.2.jar" module-name="Transport" />
+    </root>
+  </artifact>
+</component>
