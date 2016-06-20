@@ -1879,8 +1879,6 @@ public class DBHandler implements Dbms {
 				statement = null;
 			}
 		}
-		/*
-		@TODO Here we need to send a message to Transport to return their truck (transportID)!
-		 */
+		NewTransport.returnTruck(ExecuteScalarQuery("SELECT TruckPlateNum FROM Transport WHERE ID="+transportID));
 	}
 }

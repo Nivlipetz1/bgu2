@@ -70,7 +70,7 @@ public class Warehouse
 	{
 		System.out.println("Insert Transport ID: ");
 		System.out.print(">> ");
-		wh.insertTransportToWarehouse(reader.nextInt());
+		wh.insertTransportToWarehouse(getInt());
 		System.out.println("Items Successfully Loaded To The Warehouse!");
 	}
 
@@ -203,18 +203,20 @@ public class Warehouse
 	private static int getInt()
 	{
 		int choice;
-		try
+		while (true)
 		{
-			System.out.print("> ");
-			choice = reader.nextInt();
+			try
+			{
+				System.out.print("> ");
+				choice = reader.nextInt();
+				return choice;
+			} catch (Exception e)
+			{
+				System.out.println("Please insert the index number of the option you wish to use");
+				choice = -1;
+				reader.next();
+			}
 		}
-		catch(Exception e)
-		{
-			System.out.println("Please insert the index number of the option you wish to use");
-			choice = -1;
-			reader.next();
-		}
-		return choice;
 	}
 	private static void PrintReport(int catID, boolean Recursive)
 	{
@@ -258,7 +260,7 @@ public class Warehouse
 	{
 		for(MainMenu item : MainMenu.values())
 		{
-			System.out.println(item.ordinal() + ". "+ item.name());		
+			System.out.println(item.ordinal() + ". "+ item.name());
 		}
 	}
 	private static void PrintReportsMenu()

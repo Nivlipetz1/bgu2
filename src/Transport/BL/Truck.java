@@ -493,7 +493,25 @@ public class Truck {
 
 		return ans;
 	}
+	public boolean returnTruck(int truckPlateNum)
+	{
+		Statement st = null;
+		try{
+			st = db.createStatement();
+			st.executeUpdate("UPDATE Truck SET ActualWeight=WeightNeto WHERE TruckPlateNum="+truckPlateNum);
+			Run.truck.setAvailability(truckPlateNum,0);
+			st.close();
+			return true;
+		}catch(Exception e)
+		{
+			try{
+				st.close();
+			}catch (Exception e2){
 
+			}
+		}
+		return false;
+	}
 	public boolean returnTruck (int truckPlateNum, int itemID, int amount){
 		boolean ans = removeWeight(truckPlateNum, itemID, amount);
 		if (ans) setAvailability (truckPlateNum, 0);
@@ -508,19 +526,23 @@ public class Truck {
 		int itemWeight=0;
 		int allWeight = 0;
 		int newWeight=0;
+		Statement st = null;
+		ResultSet rs = null;
+		ResultSet rs2 = null;
+		Statement st2 = null;
 		try {
-			Statement st=db.createStatement();
+			st=db.createStatement();
 			String sql="SELECT ActualWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(sql);
 			
 			itemWeight = Run.item.getItemWeight(itemID);
 			allWeight = itemWeight * amount;
 			actualTruckWeight = rs.getInt("ActualWeight");
 			newWeight = actualTruckWeight - allWeight;
-
-			Statement st2=db.createStatement();
+			rs.close();
+			st2=db.createStatement();
 			String sql2="UPDATE Truck SET ActualWeight ="+newWeight+" WHERE TruckPlateNum = "+truckPlateNum+";";
-			ResultSet rs2 = st.executeQuery(sql2);
+			rs2 = st.executeQuery(sql2);
 			
 			rs.close();
 			st.close();
@@ -530,6 +552,32 @@ public class Truck {
 
 		} catch (SQLException e) {
 			ans = false;
+			try
+			{
+				rs.close();
+			} catch (SQLException e1)
+			{
+			}
+			try
+			{
+				st.close();
+			} catch (SQLException e1)
+			{
+			}
+			try
+			{
+				rs2.close();
+			} catch (SQLException e1)
+			{
+
+			}
+			try
+			{
+				st2.close();
+			} catch (SQLException e1)
+			{
+
+			}
 		}
 		return ans;
 	}

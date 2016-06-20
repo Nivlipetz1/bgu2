@@ -45,6 +45,10 @@ public class NewTransport {
         return true;
 
     }
+    public static boolean returnTruck(int truckPlateNum)
+    {
+        return Run.truck.returnTruck(truckPlateNum);
+    }
 
     private static int findMaxCapacityTruck(Vector<Integer> availableTrucks, Vector<String> noDriversForTheseLicenseTypes)
     {
