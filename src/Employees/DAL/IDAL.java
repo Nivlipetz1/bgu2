@@ -40,6 +40,5 @@ public interface IDAL {
     boolean deleteDriver(int id);
 
 
-
-
+    int getDriverInShift(String licenceType, LocalTime time, LocalDate date);
 }

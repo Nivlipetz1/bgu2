@@ -290,7 +290,10 @@ public class BL_IMPL implements IBL, DriverInformations {
 
         return driverAvailable;
     }
-
+    public int getDriverInShift(String licenceType, LocalTime time, LocalDate date)
+    {
+        return SQLDAL.getDriverInShift(licenceType,time,date);
+    }
     @Override
     public Vector<Employee> getDriverList(String licenceType, LocalTime time, LocalDate date) {
         Shift curShift = SQLDAL.getShift(date, time);

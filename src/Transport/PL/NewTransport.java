@@ -28,18 +28,17 @@ public class NewTransport {
             if(truckPlateNumber == -1)
                 return false;
             DriverInformations DI = new Employees.BL.BL_IMPL();
-            Vector<Employee> drivers = DI.getDriverList(Run.truck.getLicenceType(truckPlateNumber),ott.getStartTime(),ott.getDate());
-            if(drivers == null || drivers.isEmpty())
+            int driverID = DI.getDriverInShift(Run.truck.getLicenceType(truckPlateNumber),ott.getStartTime(),ott.getDate());
+            if(driverID == -1)
             {
                 noDriversForTheseLicenseTypes.add(Run.truck.getLicenceType(truckPlateNumber));
                 continue;
             }
-
             int handled = manageItemsTransport(truckPlateNumber, ott.getItemID(), ott.getItemAmount());
             ott.subtractAmount(handled);
-            Employee driver = drivers.remove(0);
-            Run.transport.add(transportID,truckPlateNumber,driver.getId(), ott.getSourceId(),ott.getDestId(),ott.getDate().toString(),ott.getStartTime().toString());
-            DI.setDriverBusy(driver.getId(),ott.getStartTime(),ott.getDate());
+            Run.transport.add(transportID,truckPlateNumber,driverID, ott.getSourceId(),ott.getDestId(),ott.getDate().toString(),ott.getStartTime().toString());
+            Run.transOrder.add(transportID,ott.getOrderID(),ott.getItemID(),handled,0);
+            DI.setDriverBusy(driverID,ott.getStartTime(),ott.getDate());
         }
 
         return true;
@@ -83,7 +82,7 @@ public class NewTransport {
     private static int manageItemsTransport(int truckPlateNum, int itemID, int amount)
     {
        int handled = 0;
-        while(Run.truck.canAddWeight(truckPlateNum,itemID,amount))
+        while(handled != amount && Run.truck.canAddWeight(truckPlateNum,itemID,amount))
         {
             handled++;
             Run.truck.addWeight(truckPlateNum, itemID, 1);

@@ -249,7 +249,6 @@ public class Truck {
 		Statement st = null;
 		Statement st2 = null;
 		ResultSet rs = null;
-		PreparedStatement pstmt = null;
 		try {
 			st=db.createStatement();
 			String sql="SELECT ActualWeight FROM Truck WHERE TruckPlateNum = "+truckPlateNum+";";
@@ -264,16 +263,16 @@ public class Truck {
 
 			//System.out.println("New weight= "+newWeight);
 
+			rs.close();
+			st.close();
 
 			st2=db.createStatement();
 			String sql2="UPDATE Truck SET ActualWeight = "+newWeight +" WHERE TruckPlateNum = "+truckPlateNum+";";
-			pstmt = db.prepareStatement(sql2);
-			pstmt.executeUpdate();
+			st2.executeUpdate(sql2);
 
 			ans = true;
 			
-			rs.close();
-			st.close();
+
 			st2.close();
 
 		} catch (SQLException e) {
@@ -297,12 +296,8 @@ public class Truck {
 			}catch (Exception e2){
 
 			}
-			try
-			{
-				pstmt.close();
-			}catch (Exception e2){
 
-			}
+
 		}
 		return ans;
 	}
@@ -498,7 +493,7 @@ public class Truck {
 		Statement st = null;
 		try{
 			st = db.createStatement();
-			st.executeUpdate("UPDATE Truck SET ActualWeight=WeightNeto WHERE TruckPlateNum="+truckPlateNum);
+			st.executeUpdate("UPDATE Truck SET ActualWeight=WeightNeto,Available=0 WHERE TruckPlateNum="+truckPlateNum);
 			Run.truck.setAvailability(truckPlateNum,0);
 			st.close();
 			return true;

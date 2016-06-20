@@ -615,6 +615,48 @@ public class SQLiteDAL implements IDAL{
         }
     }
 
+    @Override
+    public int getDriverInShift(String licenceType, LocalTime time, LocalDate date)
+    {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            statement = db.createStatement();
+            if (statement.execute("SELECT Driver.ID FROM Driver,Shifts,EmployeesInShifts " +
+                    "WHERE EmployeesInShifts.EmployeeID=Driver.ID AND " +
+                    "Shifts.ID=EmployeesInShifts.ShiftID AND Driver.LicenceType='"+licenceType+"' " +
+                    "AND StartTime <= '"+time.format(formatterTime)+"' AND EndTime >= '"+time.format(formatterTime)+"' AND Date='"+date.format(formatterDate)+"' "))
+                resultSet = statement.getResultSet();
+            else
+                return -1;
+            int columns = resultSet.getMetaData().getColumnCount();
+            StringBuilder message = new StringBuilder();
+            if (columns == 0)
+                return -1;
+            if (resultSet.isClosed())
+                return -1;
+            resultSet.next();
+
+            message.append(resultSet.getString(1));
+
+
+            return Integer.parseInt(message.toString());
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+            return -1;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException sqlEx) {
+                }
+            }// ignore
+
+            statement = null;
+        }
+    }
+
     private boolean updateDriver(Driver driver){
         PreparedStatement stat = null;
         try{
@@ -1050,41 +1092,46 @@ public class SQLiteDAL implements IDAL{
     }
 
     @Override
-    public Shift getShift(LocalDate d, LocalTime time) {
+    public Shift getShift(LocalDate d, LocalTime time)
+    {
         ResultSet set = null;
-        try{
+        try
+        {
             stat = db.createStatement();
             set = stat.executeQuery("SELECT * FROM Shifts " +
-                    "WHERE Date='"+d.format(formatterDate)+"' ");
+                    "WHERE Date='" + d.format(formatterDate) + "' ");
             int id = -1;
-            while(set.next()){
-                LocalTime start = LocalTime.parse(set.getString("StartTime"),formatterTime);
-                LocalTime end = LocalTime.parse(set.getString("EndTime"),formatterTime);
+            while (set.next())
+            {
+                LocalTime start = LocalTime.parse(set.getString("StartTime"), formatterTime);
+                LocalTime end = LocalTime.parse(set.getString("EndTime"), formatterTime);
                 id = set.getInt("ID");
-                if(time.isAfter(start)&&time.isBefore(end))
-                    break;
-                            }
+                if (time.isAfter(start) && time.isBefore(end)) break;
+            }
             set.close();
             stat.close();
             Shift shift = getShift(id);
             return shift;
-        }
-        catch (SQLException e){
+        } catch (SQLException e)
+        {
 
 
             try
             {
                 set.close();
-            }catch (Exception e1){}
+            } catch (Exception e1)
+            {
+            }
             try
             {
                 stat.close();
-            }catch (Exception e1){}
+            } catch (Exception e1)
+            {
+            }
             return null;
 
         }
     }
-
     @Override
     public Vector<Driver> getDriversList() {
         Vector<Employee> employees = getEmployees();

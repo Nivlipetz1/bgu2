@@ -19,5 +19,5 @@ public interface DriverInformations {
     boolean isStoreKeeperAvailable (LocalTime time, LocalDate date);
     Vector<String> getDriversTypesLicencesAvailables();
     HashMap<Employee, Integer> getAllAvailablesDriversAccordingToAvailablesTrucks(HashMap <Integer, String> availableTruckByTruckPlateNumAndLicenceType); // The first element is the Available Driver, and the Second is the TruckID
-
+    public int getDriverInShift(String licenceType, LocalTime time, LocalDate date);
 }

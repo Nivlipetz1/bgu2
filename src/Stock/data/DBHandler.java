@@ -1247,10 +1247,10 @@ public class DBHandler implements Dbms {
 
                     int source = ExecuteScalarQuery("SELECT ID FROM Place,supplier_cards WHERE Place.address=supplier_cards.address AND supplier_cards.serial_number="+supplier_serial_number);
                     int dest = ExecuteScalarQuery("SELECT ID FROM Place WHERE Place.address='SuperLee'");
-                    OrderToTransport ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.parse("10:00") ,source,dest,new NeededItem(new Item(ID),Amount));
+                    OrderToTransport ott = new OrderToTransport(OrdID, LocalDate.of(Main.today.get(Calendar.YEAR),Main.today.get(Calendar.MONTH)+1,Main.today.get(Calendar.DAY_OF_MONTH)), LocalTime.parse("10:00") ,source,dest,new NeededItem(new Item(ID),Amount));
                     if(!NewTransport.addOutcomingTransport(ott))
 					{
-						ott = new OrderToTransport(OrdID, LocalDate.now(), LocalTime.parse("16:00") ,source,dest,new NeededItem(new Item(ID),Amount));
+						ott = new OrderToTransport(OrdID, LocalDate.of(Main.today.get(Calendar.YEAR),Main.today.get(Calendar.MONTH)+1,Main.today.get(Calendar.DAY_OF_MONTH)), LocalTime.parse("16:00") ,source,dest,new NeededItem(new Item(ID),Amount));
 						if(!NewTransport.addOutcomingTransport(ott))
 						{
 							storeOrder(OrdID);
@@ -1527,7 +1527,7 @@ public class DBHandler implements Dbms {
 			}
             if(type == 2)
             {
-                lst.add(new Integer(rs.getInt("OrdID")));
+                lst.add(new Integer(rs.getInt("OrderID")));
             }
 			if (type == 3) {
 				Calendar c = Calendar.getInstance();
@@ -1714,47 +1714,7 @@ public class DBHandler implements Dbms {
 							i++;
 						}
 						//Make the order
-
 						makeOrders(sr);
-
-//						i=0;
-//						String[] productNames = new String[itemsToOrder.length];
-//						for(double[] product : itemsToOrder)
-//						{
-//							if (statement.execute("SELECT Price,discount FROM agreement_items join agreement_item_discount ON agreement_items.agreement_id=agreement_item_discount.agreement_id "
-//									+ " WHERE agreement_items.agreement_id="+agreementToSupplier[j][0]))
-//							{
-//								resultSet = statement.getResultSet();
-//								product[2]=resultSet.getInt(1);
-//								product[3]=resultSet.getDouble(2);
-//								product[4]=product[2]*product[3]*product[1];
-//							}
-//							if (statement.execute("SELECT Name From Product WHERE ID="+product[0]))
-//							{
-//								resultSet = statement.getResultSet();
-//								productNames[i]=resultSet.getString(1);
-//								i++;
-//							}
-//
-//						}
-//						int OrdID = ExecuteScalarQuery("SELECT OrdID FROM Orders WHERE SupID="+agreementToSupplier[j][1]+" AND OrderDate="+getNormalDate()+"");
-//						if(OrdID==-1)
-//						{
-//							//Make new order
-//							execUpdateSQL("INSERT INTO Orders (SupID,SupName,SupAddress,OrderDate,Contact) "
-//									+ "SELECT supplier_cards.serial_number,supplier_cards.name,supplier_cards.address,"+getNormalDate()+",email FROM supplier_cards LEFT OUTER JOIN contacts on serial_number=supplier_id"
-//									+" WHERE serial_number="+agreementToSupplier[j][1]);
-//
-//							OrdID = ExecuteScalarQuery("SELECT OrdID FROM Orders WHERE SupID="+agreementToSupplier[j][1]+" AND OrderDate="+getNormalDate()+"");
-//						}
-//
-//						for (int k = 0; k < itemsToOrder.length; k++)
-//						{
-//							execUpdateSQL("INSERT OR IGNORE INTO ItemsInOrder (OID,ID,Name,Amount,CatalogPrice,Discount,FinalPrice) VALUES"
-//											+ " (" + OrdID + "," + itemsToOrder[k][0] + ",'" + productNames[k] + "'," + itemsToOrder[k][1] + "," + itemsToOrder[k][2]
-//											+ "," + itemsToOrder[k][3] + "," + itemsToOrder[k][4] + ")");
-//							execUpdateSQL("UPDATE Product SET Expected=Expected+" + itemsToOrder[k][1] + " WHERE ID=" + itemsToOrder[k][0]);
-//						}
 					}
 				}
 			}
@@ -1838,7 +1798,7 @@ public class DBHandler implements Dbms {
 		List<Integer> orderIDs;
 		Statement statement = null;
 		ResultSet resultSet = null;
-		orderIDs = ExecuteList("SELECT OrderID FROM TransOrder",2);
+		orderIDs = ExecuteList("SELECT OrderID FROM Transport,TransOrder WHERE TransportID=ID",2);
 		if(orderIDs == null)
 			return;
 		for(Integer i : orderIDs)
@@ -1861,7 +1821,7 @@ public class DBHandler implements Dbms {
 					int NumOfItems = resultSet.getInt("NumOfItems");
 					int ItemID =resultSet.getInt("ItemID");
 					execUpdateSQL("UPDATE ItemsInOrder SET Amount=Amount-"+NumOfItems+" WHERE OID="+i+" AND ID="+ItemID);
-					execUpdateSQL("UPDATE Product SET Expected=Expected-"+NumOfItems);
+					execUpdateSQL("UPDATE Product SET Expected=Expected-"+NumOfItems+" WHERE ID="+ItemID);
 					execUpdateSQL("INSERT INTO ProductInStock (ID,ExpirationDate,AmountInStock) VALUES ("+ItemID+", date('now','+4 month'),"+NumOfItems+")");
 				}
 				execUpdateSQL("DELETE FROM ItemsInOrder WHERE OID="+i+" AND Amount<=0");

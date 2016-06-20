@@ -11,15 +11,19 @@ public class TransOrder {
 	
 	public boolean add(int transportID,int orderID, int itemID, int numOfItems, int orderSplit){ //dont split = orderSplit 0, split = orderSplit 1
 		boolean ans=true;
+		Statement st = null;
 		try {
-			Statement st=db.createStatement();
-			String sql="INSERT INTO TransOrder(TransportID,OrderID,ItemID,NumOfItems, OrderSplit)"+
-						" VALUES("+transportID+","+orderID+","+itemID+","+numOfItems+","+orderSplit+");";
+			st=db.createStatement();
+			String sql="INSERT INTO TransOrder(TransportID,OrderID,ItemID,NumOfItems)"+
+						" VALUES("+transportID+","+orderID+","+itemID+","+numOfItems+");";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 		} catch (SQLException e) {
-			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			System.exit(0);
+			try{
+				st.close();
+			}catch (Exception e1){
+
+			}
 
 		}
 
@@ -28,16 +32,20 @@ public class TransOrder {
 	
 	public  boolean remove(int transportID,int orderID){
 		boolean ans=true;
+		Statement st= null;
 		try {
-			Statement st=db.createStatement();
+			st=db.createStatement();
 			String sql="DELETE from TransOrder where TransportID="+transportID+" And OrderID="+orderID+";";
 			if(st.executeUpdate(sql)==0) ans=false;
 			st.close();
 			
 		} catch (SQLException e) {
-			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			System.exit(0);
+			try{
+				st.close();
 
+			}catch (Exception e1){
+
+			}
 		}
 
 		return ans;
