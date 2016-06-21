@@ -1798,7 +1798,7 @@ public class DBHandler implements Dbms {
         return builder.toString();
     }
 
-	public void insertTransportToWarehouse(int transportID)
+	public void insertTransportToWarehouse(int transportID, HashMap<Integer,Integer> damaged)
 	{
 		List<Integer> orderIDs;
 		Statement statement = null;
@@ -1825,9 +1825,14 @@ public class DBHandler implements Dbms {
 				{
 					int NumOfItems = resultSet.getInt("NumOfItems");
 					int ItemID =resultSet.getInt("ItemID");
+					int actuallyArrived = NumOfItems;
+					if(damaged!=null && damaged.keySet().contains(new Integer(ItemID)))
+					{
+						actuallyArrived = NumOfItems - damaged.get(new Integer(ItemID));
+					}
 					execUpdateSQL("UPDATE ItemsInOrder SET Amount=Amount-"+NumOfItems+" WHERE OID="+i+" AND ID="+ItemID);
 					execUpdateSQL("UPDATE Product SET Expected=Expected-"+NumOfItems+" WHERE ID="+ItemID);
-					execUpdateSQL("INSERT INTO ProductInStock (ID,ExpirationDate,AmountInStock) VALUES ("+ItemID+", date('now','+4 month'),"+NumOfItems+")");
+					execUpdateSQL("INSERT INTO ProductInStock (ID,ExpirationDate,AmountInStock) VALUES ("+ItemID+", date('now','+4 month'),"+actuallyArrived+")");
 				}
 				execUpdateSQL("DELETE FROM ItemsInOrder WHERE OID="+i+" AND Amount<=0");
 				execUpdateSQL("DELETE FROM Orders WHERE Orders.OrdID NOT IN (SELECT DISTINCT OID FROM ItemsInOrder)");
@@ -1843,6 +1848,12 @@ public class DBHandler implements Dbms {
 				}// ignore
 				statement = null;
 			}
+		}
+		try{
+			execUpdateSQL("DELETE FROM Transport WHERE ID="+transportID);
+			execUpdateSQL("DELETE FROM TransOrder WHERE TransportID="+transportID);
+		}catch (Exception e){
+
 		}
 		NewTransport.returnTruck(ExecuteScalarQuery("SELECT TruckPlateNum FROM Transport WHERE ID="+transportID));
 	}

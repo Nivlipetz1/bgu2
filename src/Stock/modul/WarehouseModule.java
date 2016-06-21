@@ -1,5 +1,6 @@
 package Stock.modul;
 
+import java.util.HashMap;
 import java.util.List;
 
 import Stock.common.Product;
@@ -96,9 +97,9 @@ public class WarehouseModule implements IWarehouseModule
 		db.clearFaulty();
 	}
 
-	public void insertTransportToWarehouse(int transportID)
+	public void insertTransportToWarehouse(int transportID, HashMap<Integer,Integer> damaged)
 	{
-		db.insertTransportToWarehouse(transportID);
+		db.insertTransportToWarehouse(transportID, damaged);
 	}
 
 }

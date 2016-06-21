@@ -68,10 +68,40 @@ public class Warehouse
 
 	private static void incomingTransport()
 	{
+		HashMap<Integer,Integer> damaged = null;
+
+		System.out.println("Do you wish to report missing or damaged items?\nEnter 1 for Yes or any other number for No");
+		if(getInt()==1)
+			damaged = getListOfItems();
 		System.out.println("Insert Transport ID: ");
 		System.out.print(">> ");
-		wh.insertTransportToWarehouse(getInt());
+		wh.insertTransportToWarehouse(getInt(), damaged);
 		System.out.println("Items Successfully Loaded To The Warehouse!");
+	}
+
+	private static HashMap<Integer,Integer> getListOfItems()
+	{
+		HashMap<Integer,Integer> damaged = new HashMap<>();
+		int choice=-2;
+		while(choice != 0)
+		{
+			System.out.println("Next item: (0 if done)");
+			choice = getInt();
+			if(choice > 0)
+			{
+				System.out.println("How many of those are damaged? ");
+				damaged.put(choice,getInt());
+			}
+			else
+			{
+				if(choice==0)
+					System.out.println("Got it.");
+				else
+					System.out.println("Invalid ID.");
+			}
+		}
+
+		return damaged;
 	}
 
 	private static void TakeItems()
